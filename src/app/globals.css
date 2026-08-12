@@ -1,0 +1,444 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --ink: #050403;
+    --stone: #171310;
+    --gold: #e0a83e;
+    --ember: #ff8c3c;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    color: #f2ece0;
+    background: var(--ink);
+    overflow-x: hidden;
+}
+
+h1,
+h2,
+h3 {
+    margin: 0;
+}
+
+/* Background: an optional photo (TV route only, see Background.tsx), a translucent
+   brick/vignette tint on top of it, and two blurred, flickering "torch" glows above that.
+   Cheap on purpose (opacity/transform only, no video) so it holds up on weak TV browsers. */
+.menu-background {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--ink);
+}
+
+.menu-background-photo {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Each layer here paints semi-opaque over the last, so alphas compound fast — stacking a
+   few "reasonable-looking" 0.35-0.45 layers adds up to ~90% opaque and hides the photo
+   underneath. Kept deliberately light: seams are near-transparent 1px lines, not full-tile
+   fills, and the base tint is the only layer with real coverage. */
+.menu-background-filter {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 70% 55% at 50% 0%, rgba(30, 21, 12, 0.4) 0%, transparent 65%),
+        repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0px 1px, transparent 1px 40px),
+        repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.12) 0px 1px, transparent 1px 60px), rgba(5, 4, 3, 0.35);
+}
+
+.torch {
+    position: absolute;
+    top: 8%;
+    width: 14vw;
+    height: 14vw;
+    max-width: 220px;
+    max-height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 150, 60, 0.55) 0%, rgba(255, 100, 20, 0.18) 55%, transparent 75%);
+    filter: blur(6px);
+    animation: torch-flicker 2.6s ease-in-out infinite;
+}
+
+.torch-left {
+    left: 2%;
+}
+
+.torch-right {
+    right: 2%;
+    animation-delay: 1.1s;
+}
+
+@keyframes torch-flicker {
+    0%,
+    100% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    22% {
+        opacity: 0.55;
+        transform: scale(0.93);
+    }
+    48% {
+        opacity: 1;
+        transform: scale(1.06);
+    }
+    74% {
+        opacity: 0.65;
+        transform: scale(0.97);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .torch {
+        animation: none;
+        opacity: 0.75;
+    }
+}
+
+/* Screen header */
+.screen-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.screen-eyebrow {
+    font-family: var(--font-display);
+    font-size: clamp(0.6rem, 1.4vw, 0.9rem);
+    letter-spacing: 0.35em;
+    color: #8d8477;
+    text-transform: uppercase;
+}
+
+.screen-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 5.5vw, 3.4rem);
+    line-height: 1.3;
+    color: var(--gold);
+    text-shadow:
+        0 0 12px rgba(224, 168, 62, 0.45),
+        0 3px 0 #4a3410;
+    text-transform: uppercase;
+}
+
+.screen-subtitle {
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 2.2vw, 1.4rem);
+    letter-spacing: 0.2em;
+    color: #cfc7b8;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+}
+
+.screen-price {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: clamp(0.9rem, 1.8vw, 1.15rem);
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-transform: uppercase;
+    border: 1px solid rgba(224, 168, 62, 0.4);
+    padding: 0.15rem 0.75rem;
+    margin-top: 0.6rem;
+}
+
+/* Grid */
+.menu-grid-viewport {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.menu-grid {
+    display: grid;
+    /* grid-template-columns is set inline by MenuGrid (useBalancedColumns) so rows fill evenly
+       instead of CSS auto-fit's greedy packing (e.g. 7 cards on row 1, 3 stranded on row 2). */
+    gap: 1rem;
+    width: 100%;
+    max-width: 90rem;
+}
+
+/* Cards */
+.potion-card {
+    --accent: #e0a83e;
+    position: relative;
+    aspect-ratio: 3 / 4;
+    display: flex;
+    flex-direction: column;
+    /* A diagonal gradient run through border-image reads as a beveled metal frame for free:
+       each edge/corner samples a different part of the gradient, so top-left comes out lit
+       and bottom-right comes out shadowed, no bitmap needed. */
+    border: 3px solid transparent;
+    border-image: linear-gradient(135deg, #f3d99a 0%, #b8873a 32%, #6b4c1e 68%, #2b1d0c 100%) 1;
+    background:
+        radial-gradient(circle 3px at 7px 7px, #f3d99a 92%, transparent 100%),
+        radial-gradient(circle 3px at calc(100% - 7px) 7px, #f3d99a 92%, transparent 100%),
+        radial-gradient(circle 3px at 7px calc(100% - 7px), #f3d99a 92%, transparent 100%),
+        radial-gradient(circle 3px at calc(100% - 7px) calc(100% - 7px), #f3d99a 92%, transparent 100%),
+        rgba(10, 8, 6, 0.72);
+    padding: 1.25rem 0.9rem 0.85rem;
+    text-align: center;
+    box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.55);
+    /* Same duration/easing/keyframe stops as .torch-flicker so the frame's inner bevel visibly
+       catches the torchlight; nth-child stagger below keeps a row of cards from pulsing in
+       unison like they're all wired to one switch. */
+    animation: frame-flicker 2.6s ease-in-out infinite;
+}
+
+.potion-card:nth-child(3n + 1) {
+    animation-delay: 0s;
+}
+
+.potion-card:nth-child(3n + 2) {
+    animation-delay: 0.9s;
+}
+
+.potion-card:nth-child(3n) {
+    animation-delay: 1.7s;
+}
+
+@keyframes frame-flicker {
+    0%,
+    100% {
+        box-shadow:
+            inset 0 0 18px rgba(0, 0, 0, 0.55),
+            inset 2px 2px 0 rgba(255, 214, 150, 0.2),
+            inset -2px -2px 0 rgba(0, 0, 0, 0.5);
+    }
+    22% {
+        box-shadow:
+            inset 0 0 18px rgba(0, 0, 0, 0.55),
+            inset 2px 2px 0 rgba(255, 214, 150, 0.1),
+            inset -2px -2px 0 rgba(0, 0, 0, 0.55);
+    }
+    48% {
+        box-shadow:
+            inset 0 0 18px rgba(0, 0, 0, 0.55),
+            inset 2px 2px 0 rgba(255, 214, 150, 0.3),
+            inset -2px -2px 0 rgba(0, 0, 0, 0.45);
+    }
+    74% {
+        box-shadow:
+            inset 0 0 18px rgba(0, 0, 0, 0.55),
+            inset 2px 2px 0 rgba(255, 214, 150, 0.13),
+            inset -2px -2px 0 rgba(0, 0, 0, 0.52);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .potion-card {
+        animation: none;
+    }
+}
+
+.potion-icon-wrap {
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.potion-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Out-of-stock: derived automatically whenever any composing ingredient's inStock is false
+   (see composeRecipes in drinksData.ts) — nothing about this is set per-drink in the sheet. */
+.potion-card.out-of-stock .potion-icon,
+.potion-card.out-of-stock .potion-name,
+.potion-card.out-of-stock .potion-flavor,
+.potion-card.out-of-stock .potion-base {
+    filter: grayscale(1) brightness(0.45);
+}
+
+.out-of-stock-cross {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+/* Vertical bars fanned into a narrow X (rather than near-horizontal ones) to match the
+   card's own taller-than-wide proportions. */
+.out-of-stock-cross::before,
+.out-of-stock-cross::after {
+    content: "";
+    position: absolute;
+    top: 8%;
+    left: 50%;
+    width: 5px;
+    height: 84%;
+    background: #dc2626;
+    box-shadow: 0 0 8px rgba(220, 38, 38, 0.8);
+}
+
+.out-of-stock-cross::before {
+    transform: translateX(-50%) rotate(20deg);
+}
+
+.out-of-stock-cross::after {
+    transform: translateX(-50%) rotate(-20deg);
+}
+
+.potion-index {
+    position: absolute;
+    top: 0.4rem;
+    left: 0.7rem;
+    font-family: var(--font-body);
+    font-size: 1.4rem;
+    color: #e8dfcd;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.potion-icon {
+    height: 100%;
+    width: auto;
+    aspect-ratio: 24 / 30; /* matches PotionIcon's viewBox so height:100% sizes width correctly */
+}
+
+.potion-name {
+    font-family: var(--font-body);
+    font-size: 1.9rem;
+    line-height: 1.15;
+    /* Reserves two lines' height so a wrapped name doesn't push this card's flavor/spirit
+       rows out of alignment with shorter, single-line names in the same grid row. */
+    min-height: 2.3em;
+    letter-spacing: 0.03em;
+    color: var(--accent);
+    text-transform: uppercase;
+}
+
+.potion-flavor {
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    color: #cfc7b8;
+    margin-top: 0.15rem;
+}
+
+.potion-base {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+    color: #8d8477;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+    border-top: 1px solid #241f18;
+    padding-top: 0.4rem;
+}
+
+.ingredient-glyph {
+    margin-right: 0.25rem;
+}
+
+/* Scrollbox */
+.scrollbox {
+    border: 2px solid #4c2f7a;
+    background: rgba(10, 8, 6, 0.6);
+    padding: 0.75rem 1.25rem;
+    margin-top: 1.5rem;
+    min-height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: var(--font-body);
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    color: #d8cff0;
+    letter-spacing: 0.05em;
+}
+
+/* Mobile route */
+.mobile-menu {
+    position: relative;
+    z-index: 1;
+    padding: 2rem 1.25rem 3rem;
+    max-width: 64rem;
+    margin: 0 auto;
+}
+
+.mobile-hero {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.mobile-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 9vw, 3.2rem);
+    color: var(--gold);
+    text-shadow: 0 0 16px rgba(224, 168, 62, 0.45);
+    margin-top: 0.5rem;
+}
+
+.menu-screen + .menu-screen {
+    margin-top: 3rem;
+}
+
+/* TV route */
+.tv-stage {
+    position: relative;
+    z-index: 1;
+    height: 100dvh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3vh 3vw;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.tv-stage .menu-screen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+}
+
+.tv-stage .menu-grid-viewport {
+    flex: 1;
+    min-height: 0;
+}
+
+.tv-stage-animated {
+    animation: tv-fade-in 0.6s ease;
+}
+
+@keyframes tv-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.sample-data-badge {
+    position: fixed;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    z-index: 10;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+    color: #171310;
+    background: var(--gold);
+    padding: 0.25rem 0.6rem;
+}
