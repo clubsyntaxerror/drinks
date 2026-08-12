@@ -57,11 +57,12 @@ The drinks spreadsheet needs four tabs, header row included. Drinks don't carry 
 
 **`Items`** — the drinks/elixirs/basics themselves (no price column — see `Screens` below):
 
-| order | category  | name          | ingredientIds       | tag | active |
-| ----- | --------- | ------------- | ------------------- | --- | ------ |
-| `1`   | `elixirs` | Health Potion | `vodka,pomegranate` |     | `TRUE` |
+| order | category  | name          | emblem | ingredientIds       | tag | active |
+| ----- | --------- | ------------- | ------ | ------------------- | --- | ------ |
+| `1`   | `elixirs` | Health Potion | ❤️     | `vodka,pomegranate` |     | `TRUE` |
 
 - `category` matches a `Screens.key` below.
+- `emblem` is optional — an emoji embossed into the potion icon's liquid (e.g. ❤️ for Health Potion, matching `reference/elixirs.jpg`). Blank just omits it.
 - `ingredientIds` is a comma-separated list of `Ingredients.id` values — one or more spirits, one or more others.
 
 **`Messages`** — scrollbox content:

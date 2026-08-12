@@ -22,6 +22,7 @@ export type Recipe = {
     order: number;
     category: string; // free text, matches a Screen.key — not a hardcoded enum
     name: string;
+    emblem: string | undefined; // an emoji embossed into the potion icon, e.g. "❤️" for Health Potion
     ingredientIds: string[];
     tag: string | undefined;
     active: boolean;
@@ -33,6 +34,7 @@ export type Item = {
     order: number;
     category: string;
     name: string;
+    emblem: string | undefined;
     spirits: Ingredient[];
     flavors: Ingredient[]; // every non-spirit ingredient (fruit, mixer, garnish, or a Basics beverage)
     accentColor: string;
@@ -87,6 +89,7 @@ export function composeRecipes(recipes: Recipe[], ingredients: Ingredient[]): It
             order: recipe.order,
             category: recipe.category,
             name: recipe.name,
+            emblem: recipe.emblem,
             spirits,
             flavors,
             accentColor: flavors[0]?.color ?? spirits[0]?.color ?? "#e0a83e",
@@ -131,12 +134,13 @@ export const getRecipes = cache(async (): Promise<Recipe[]> => {
                         order: Number(row[0]) || 0,
                         category: (row[1] ?? "").trim(),
                         name: row[2] ?? "",
-                        ingredientIds: (row[3] ?? "")
+                        emblem: row[3] || undefined,
+                        ingredientIds: (row[4] ?? "")
                             .split(",")
                             .map((id) => id.trim())
                             .filter(Boolean),
-                        tag: row[4] || undefined,
-                        active: isTruthy(row[5]),
+                        tag: row[5] || undefined,
+                        active: isTruthy(row[6]),
                     }) satisfies Recipe,
             )
             .filter((recipe) => recipe.active && recipe.name)

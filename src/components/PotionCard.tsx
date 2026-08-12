@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { PotionIcon, IngredientGlyph } from "./icons";
+import { PotionIcon, IngredientGlyph, OutOfStockCross } from "./icons";
 import type { Item } from "../app/drinksData";
 
 export default function PotionCard({ item, index }: { item: Item; index: number }) {
@@ -10,7 +10,7 @@ export default function PotionCard({ item, index }: { item: Item; index: number 
         >
             <span className="potion-index">{String(index + 1).padStart(2, "0")}</span>
             <div className="potion-icon-wrap">
-                <PotionIcon color={item.accentColor} className="potion-icon" />
+                <PotionIcon color={item.accentColor} emblem={item.emblem} className="potion-icon" />
             </div>
             <div className="potion-body">
                 <h3 className="potion-name">{item.name}</h3>
@@ -28,7 +28,7 @@ export default function PotionCard({ item, index }: { item: Item; index: number 
                     </p>
                 )}
             </div>
-            {item.outOfStock && <div className="out-of-stock-cross" aria-hidden="true" />}
+            {item.outOfStock && <OutOfStockCross className="out-of-stock-cross" />}
         </article>
     );
 }

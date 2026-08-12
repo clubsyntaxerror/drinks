@@ -67,7 +67,9 @@ export function useFitToViewport(
 // on row 1, leftovers on row 2"), by first finding how many minColumnWidth-wide columns fit in
 // the container, then working out the row count that needs, then dividing items evenly across
 // that many rows. Matches the reference image's rectangular grid instead of CSS auto-fit's
-// greedy packing.
+// greedy packing. Uncapped on purpose: a bigger roster (e.g. Drinks) is meant to spread wider
+// and use more of the screen than a small one (e.g. Elixirs' 10 items -> 5x2), not shrink into
+// more rows at the same column count.
 export function useBalancedColumns(
     containerRef: RefObject<HTMLElement | null>,
     itemCount: number,
