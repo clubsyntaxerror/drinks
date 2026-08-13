@@ -38,14 +38,22 @@ body {
     font-family: var(--font-bitpotion);
 }
 
-/* Background: an optional photo (TV route only, see Background.tsx), a translucent
-   brick/vignette tint on top of it, and two blurred, flickering "torch" glows above that.
-   Cheap on purpose (opacity/transform only, no video) so it holds up on weak TV browsers. */
+/* Background: an optional photo, a translucent vignette tint on top of it, and (dungeon theme
+   only) two blurred, flickering "torch" glows above that. Cheap on purpose (opacity/transform
+   only, no video) so it holds up on weak TV browsers.
+   Fixed by default (the TV route: .tv-stage already fills the viewport, so a plain viewport-
+   fixed layer is simplest and ignores .tv-stage's own padding entirely). .menu-background-
+   scoped switches to absolute for the mobile route, where each stacked screen section needs
+   its own background instead of one global layer — see .menu-screen's position: relative. */
 .menu-background {
     position: fixed;
     inset: 0;
     z-index: -1;
     background: var(--ink);
+}
+
+.menu-background-scoped {
+    position: absolute;
 }
 
 .menu-background-photo {
@@ -67,6 +75,16 @@ body {
         radial-gradient(ellipse 70% 55% at 50% 0%, rgba(30, 21, 12, 0.4) 0%, transparent 65%),
         repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0px 1px, transparent 1px 40px),
         repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.12) 0px 1px, transparent 1px 60px), rgba(5, 4, 3, 0.35);
+}
+
+/* "arcade" theme (Drinks/character-select) — WIP placeholder mood: same layered-gradient
+   technique as the dungeon tint above, just shifted cool/blue instead of warm/brown, and with
+   no torches (see Background.tsx). Swap for bespoke art later without touching this class. */
+.menu-background-arcade .menu-background-filter {
+    background:
+        radial-gradient(ellipse 70% 55% at 50% 0%, rgba(20, 20, 48, 0.45) 0%, transparent 65%),
+        repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16) 0px 1px, transparent 1px 40px),
+        repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.12) 0px 1px, transparent 1px 60px), rgba(6, 6, 16, 0.4);
 }
 
 .torch {
@@ -608,6 +626,131 @@ body {
     margin-right: 0.05rem;
 }
 
+/* Roster grid (Drinks "character select" template) — WIP placeholder (see spec.md/README):
+   deliberately plain CSS instead of the Elixirs frame/potion art, standing in until bespoke
+   character-select art exists. Denser than .potion-card on purpose (RosterGrid.tsx's smaller
+   MIN_CARD_WIDTH_PX) so a 17-item roster still reads as one screen instead of needing to
+   shrink drastically or scroll. */
+.roster-grid-viewport {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.roster-groups {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.roster-group {
+    flex: 1 1 320px;
+    min-width: 0;
+}
+
+.roster-group-label {
+    font-family: var(--font-bitpotion);
+    font-size: 1.2rem;
+    letter-spacing: 0.15em;
+    color: #9aa0b4;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 0.6rem;
+}
+
+/* A plain vertical rule between the two "sides" — hidden once they wrap to a stacked layout
+   (narrow/mobile viewports) since a vertical divider stops making sense between rows instead
+   of columns. */
+.roster-divider {
+    align-self: stretch;
+    width: 2px;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(255, 255, 255, 0.2) 15%,
+        rgba(255, 255, 255, 0.2) 85%,
+        transparent
+    );
+}
+
+@media (max-width: 700px) {
+    .roster-divider {
+        display: none;
+    }
+}
+
+.roster-grid {
+    display: grid;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.character-card {
+    --accent: #e0a83e;
+    position: relative;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(8, 9, 16, 0.78);
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    padding: 0.5rem 0.4rem 0.4rem;
+    text-align: center;
+}
+
+.character-index {
+    position: absolute;
+    top: 0.3rem;
+    left: 0.4rem;
+    font-family: var(--font-bitpotion);
+    font-size: 1rem;
+    color: #9aa0b4;
+}
+
+.character-price {
+    position: absolute;
+    top: 0.3rem;
+    right: 0.4rem;
+    font-family: var(--font-bitpotion);
+    font-size: 1rem;
+    color: var(--gold);
+}
+
+.character-portrait {
+    font-size: 2.6rem;
+    line-height: 1;
+}
+
+.character-name {
+    font-family: var(--font-bitpotion);
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+    color: var(--name-color);
+    text-transform: uppercase;
+    margin-top: 0.4rem;
+}
+
+.character-caption {
+    font-family: var(--font-bitpotion);
+    font-size: 0.7rem;
+    color: #9aa0b4;
+    margin-top: 0.15rem;
+    line-height: 1.2;
+}
+
+.character-card.out-of-stock {
+    filter: grayscale(1) brightness(0.55);
+}
+
 /* Scrollbox */
 .scrollbox {
     border: 5px solid #4c2f7a;
@@ -647,6 +790,14 @@ body {
     margin-top: 0.5rem;
 }
 
+/* position: relative + overflow: hidden so each screen's own scoped Background (mobile route,
+   see MenuScreen.tsx/Background.tsx) is contained to just this section instead of bleeding
+   into neighboring ones or clipping oddly at the torch glow's blur radius. */
+.menu-screen {
+    position: relative;
+    overflow: hidden;
+}
+
 .menu-screen + .menu-screen {
     margin-top: 3rem;
 }
@@ -666,6 +817,19 @@ body {
     overflow: hidden;
 }
 
+/* Wraps just the active screen's own content (not Scrollbox — see ScreenCarousel.tsx) so only
+   this remounts/fades on a screen change, taking over the layout role .menu-screen used to play
+   as .tv-stage's direct flex child now that it sits one level deeper. */
+.tv-stage-screen {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .tv-stage .menu-screen {
     width: 100%;
     height: 100%;
@@ -676,7 +840,8 @@ body {
     min-height: 0;
 }
 
-.tv-stage .menu-grid-viewport {
+.tv-stage .menu-grid-viewport,
+.tv-stage .roster-grid-viewport {
     flex: 1;
     min-height: 0;
 }

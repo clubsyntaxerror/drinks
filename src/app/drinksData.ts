@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { getSheetRows } from "./sheets";
 import { sampleIngredients, sampleRecipes, sampleMessages, sampleScreens } from "./sampleData";
+import { TEMPLATE_KEYS, DEFAULT_TEMPLATE_KEY, type TemplateKey } from "./templateKeys";
 
 export const revalidate = 120;
 
@@ -51,6 +52,15 @@ export type Message = {
     toTime: string | undefined; // "HH:MM" — message stops showing at this time
 };
 
+// TEMPLATE_KEYS/DEFAULT_TEMPLATE_KEY live in ./templateKeys, not here, so that
+// components/templates.ts (imported by the client-side ScreenCarousel) can use
+// DEFAULT_TEMPLATE_KEY without pulling this module's server-only ./sheets/googleapis
+// dependency into the browser bundle. See that file for why.
+function resolveTemplateKey(value: string | undefined): TemplateKey {
+    const key = (value ?? "").trim().toLowerCase();
+    return (TEMPLATE_KEYS as readonly string[]).includes(key) ? (key as TemplateKey) : DEFAULT_TEMPLATE_KEY;
+}
+
 export type Screen = {
     order: number;
     key: string; // matches Item.category
@@ -58,6 +68,7 @@ export type Screen = {
     subtitle: string | undefined;
     durationSeconds: number;
     active: boolean;
+    template: TemplateKey; // which visual template this screen renders as — see TEMPLATE_KEYS above
 };
 
 function isTruthy(value: string | undefined) {
@@ -187,6 +198,7 @@ export const getScreens = cache(async (): Promise<Screen[]> => {
                         subtitle: row[3] || undefined,
                         durationSeconds: Number(row[4]) || 14,
                         active: isTruthy(row[5]),
+                        template: resolveTemplateKey(row[6]),
                     }) satisfies Screen,
             )
             .filter((screen) => screen.active && screen.key)

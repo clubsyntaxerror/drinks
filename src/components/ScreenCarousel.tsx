@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { useMediaQuery } from "./utils/hooks";
 import MenuScreen from "./MenuScreen";
 import Scrollbox from "./Scrollbox";
+import Background from "./Background";
+import { getTemplate } from "./templates";
 import type { Item, Message, Screen } from "../app/drinksData";
 
 // TV-only: cycles through `screens` on a per-screen timer read from the sheet. Debug params:
@@ -49,9 +51,18 @@ export default function ScreenCarousel({
         return null;
     }
 
+    const template = getTemplate(active.template);
+
     return (
-        <div className={`tv-stage${prefersReducedMotion ? "" : " tv-stage-animated"}`} key={active.key}>
-            <MenuScreen screen={active} items={activeItems} fitToViewport />
+        // Scrollbox sits outside the keyed/remounted subtree below on purpose — it holds its
+        // own message-cycling timer, and a guest reading a message mid-cycle shouldn't see it
+        // jump back to message 1 just because the screen behind it changed. Only the screen's
+        // own content (and its background, which *should* change per screen) remounts.
+        <div className="tv-stage">
+            <Background key={active.key} image={template.backgroundImage} theme={template.backgroundTheme} />
+            <div className={`tv-stage-screen${prefersReducedMotion ? "" : " tv-stage-animated"}`} key={active.key}>
+                <MenuScreen screen={active} items={activeItems} fitToViewport />
+            </div>
             <Scrollbox messages={messages} />
         </div>
     );

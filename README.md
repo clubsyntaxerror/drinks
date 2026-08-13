@@ -14,11 +14,15 @@ Sibling project to [`syntaxerrorsthlm/website`](../website) — same tech stack 
 
 Three screens today, cycling in this order on `/tv` and stacked in this order on `/`:
 
-1. **Elixirs** — the flagship cocktail menu (as in `reference/elixirs.jpg`)
-2. **Drinks** — other cocktails
+1. **Elixirs** — the flagship cocktail menu (as in `reference/elixirs.jpg`), styled as a dungeon-crawler inventory grid
+2. **Drinks** — other cocktails, styled as a video-game character-select roster (each drink's `emblem` doubles as a placeholder character portrait)
 3. **The Basics** _(working title — beers, ciders, wines, sparkling wines, sodas)_
 
 Screens are driven from the sheet's `Screens` tab, so this list (name, order, timing) can change without a code deploy. Each item can carry its own price, shown on the card itself (e.g. "139:-").
+
+### Templates
+
+Each screen picks a visual **template** — not just a color/asset skin, but a genuinely different screen concept (a different "location" in the game, per `spec.md` §8/§13). `elixirs` (dungeon inventory grid) and `drinks` (character-select roster, split into a joke "This Side"/"That Side" for roster-select flavor) exist today; adding a third is a new entry in `src/components/templates.ts` plus whatever Grid/Card component it needs, not a growing pile of conditionals in shared components. The Drinks/character-select look is a deliberate placeholder (plain CSS, no bespoke frame/portrait art) until real art exists — see that file's comments.
 
 ## Look & feel
 
@@ -79,11 +83,13 @@ The drinks spreadsheet needs four tabs, header row included. Drinks don't carry 
 
 **`Screens`** — drives cycling order/timing on `/tv` and section order on `/`:
 
-| order | key       | title      | subtitle                   | durationSeconds | active |
-| ----- | --------- | ---------- | -------------------------- | --------------- | ------ |
-| `1`   | `elixirs` | Elixirs    | Choose your potion         | `14`            | `TRUE` |
-| `2`   | `drinks`  | Drinks     | Classic & signature        | `14`            | `TRUE` |
-| `3`   | `basics`  | The Basics | Beer · Cider · Wine · Soda | `14`            | `TRUE` |
+| order | key       | title      | subtitle                   | durationSeconds | active | template  |
+| ----- | --------- | ---------- | -------------------------- | --------------- | ------ | --------- |
+| `1`   | `elixirs` | Elixirs    | Choose your potion         | `14`            | `TRUE` | `elixirs` |
+| `2`   | `drinks`  | Drinks     | Classic & signature        | `14`            | `TRUE` | `drinks`  |
+| `3`   | `basics`  | The Basics | Beer · Cider · Wine · Soda | `14`            | `TRUE` | `elixirs` |
+
+- `template` is optional — one of the keys in `src/components/templates.ts` (currently `elixirs` or `drinks`). Blank or an unrecognized value falls back to whichever key `DEFAULT_TEMPLATE_KEY` (`src/app/templateKeys.ts`) points at, so an old sheet row or a typo doesn't break the screen — it just renders in the default look instead.
 
 Until the spreadsheet exists (or env vars aren't set), the site falls back to bundled sample data (`src/app/sampleData.ts`) so `npm run dev` always renders a real-looking menu.
 
