@@ -52,7 +52,7 @@ export default function ScreenCarousel({
     return (
         <div className={`tv-stage${prefersReducedMotion ? "" : " tv-stage-animated"}`} key={active.key}>
             <MenuScreen screen={active} items={activeItems} fitToViewport />
-            <Scrollbox messages={messages.map((message) => message.text)} />
+            <Scrollbox messages={messages} />
         </div>
     );
 }

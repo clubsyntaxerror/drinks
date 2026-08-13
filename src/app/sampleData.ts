@@ -379,8 +379,19 @@ export const sampleRecipes: Recipe[] = [
 ];
 
 export const sampleMessages: Message[] = [
-    { order: 1, text: "HAPPY HOUR: BEER, CIDER, WINE, SPARKLING & SODA UNTIL 23:00!", active: true },
-    { order: 3, text: "DON'T FORGET TO PARTICIPATE IN THE QUIZ WALK!", active: true },
+    {
+        order: 1,
+        text: "HAPPY HOUR: BEER, CIDER, WINE, SPARKLING & SODA UNTIL 23:00!",
+        active: true,
+        fromTime: undefined,
+        toTime: "23:00",
+    },
+    {
+        order: 2, text: "WELCOME TO SYNTAX ERROR!", active: true,
+        fromTime: undefined,
+        toTime: undefined
+    },
+    { order: 3, text: "DON'T FORGET TO PARTICIPATE IN THE QUIZ WALK!", active: true, fromTime: undefined, toTime: "01:00" },
 ];
 
 export const sampleScreens: Screen[] = [

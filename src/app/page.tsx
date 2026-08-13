@@ -22,7 +22,7 @@ export default async function HomePage() {
                         items={items.filter((item) => item.category.toLowerCase() === screen.key.toLowerCase())}
                     />
                 ))}
-                <Scrollbox messages={messages.map((message) => message.text)} />
+                <Scrollbox messages={messages} />
             </main>
         </>
     );

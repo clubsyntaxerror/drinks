@@ -49,6 +49,8 @@ export type Message = {
     order: number;
     text: string;
     active: boolean;
+    fromTime: string | undefined; // "HH:MM" — message only shows from this time onward (see isWithinDailyWindow)
+    toTime: string | undefined; // "HH:MM" — message stops showing at this time
 };
 
 export type Screen = {
@@ -166,6 +168,8 @@ export const getMessages = cache(async (): Promise<Message[]> => {
                         order: Number(row[0]) || 0,
                         text: row[1] ?? "",
                         active: isTruthy(row[2]),
+                        fromTime: row[3] || undefined,
+                        toTime: row[4] || undefined,
                     }) satisfies Message,
             )
             .filter((message) => message.active && message.text)
