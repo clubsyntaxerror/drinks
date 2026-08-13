@@ -300,7 +300,7 @@ export const sampleRecipes: Recipe[] = [
     {
         order: 15,
         category: "drinks",
-        name: "Leon Kennedy – Rookie's Remedy",
+        name: "Leon Kennedys Rookie Remedy",
         emblem: "🦁",
         ingredientIds: ["lemon", "green-apple", "ginger", "gin"],
         active: true,
@@ -396,24 +396,24 @@ export const sampleMessages: Message[] = [
 ];
 
 export const sampleScreens: Screen[] = [
-    {
-        order: 1,
-        key: "elixirs",
-        title: "Elixirs",
-        subtitle: "Choose your potion",
-        durationSeconds: 1,
-        active: true,
-        template: "elixirs",
-    },
     // {
-    //     order: 2,
-    //     key: "drinks",
-    //     title: "Drinks",
-    //     subtitle: "Choose your character",
-    //     durationSeconds: 14,
+    //     order: 1,
+    //     key: "elixirs",
+    //     title: "Elixirs",
+    //     subtitle: "Choose your potion",
+    //     durationSeconds: 1,
     //     active: true,
-    //     template: "drinks",
+    //     template: "elixirs",
     // },
+    {
+        order: 2,
+        key: "drinks",
+        title: "Drinks",
+        subtitle: "Choose your character",
+        durationSeconds: 14,
+        active: true,
+        template: "drinks",
+    },
     // {
     //     order: 3,
     //     key: "basics",

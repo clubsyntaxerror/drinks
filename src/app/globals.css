@@ -714,50 +714,105 @@ body {
 }
 
 /* No border for now (placeholder phase — a real frame is coming with bespoke art later); the
-   accent shows through the portrait/name/stats instead so cards don't read as flat/undefined
+   accent shows through the portrait/name/price instead so cards don't read as flat/undefined
    without one. */
 .character-card {
     --accent: #e0a83e;
     position: relative;
-    aspect-ratio: 1 / 1.6;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    gap: 0.75rem;
     background: rgba(8, 9, 16, 0.78);
     border-radius: 4px;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-    padding: 1rem;
-    text-align: center;
+    padding: 0.6rem;
+    text-align: left;
+}
+
+/* No./Price as corner badges over the portrait — mirrors .potion-index/.potion-price's
+   top-corner placement in the Elixirs layout instead of a stat list under the ingredients. */
+.character-index,
+.character-price {
+    position: absolute;
+    top: 0.5rem;
+    font-family: var(--font-bitpotion);
+    font-size: 2.8rem;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+    z-index: 1;
+}
+
+.character-index {
+    left: 0.6rem;
+    color: #9aa0b4;
+}
+
+.character-price {
+    right: 0.6rem;
+    color: var(--gold);
 }
 
 .character-portrait {
-    font-size: 6rem;
+    flex: 0 0 auto;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
     line-height: 1;
 }
 
-/* Card footprint (grid/aspect-ratio) is locked — these are allowed to wrap onto more lines /
-   crowd the fixed box rather than stay a single tidy line, per explicit request. */
+.character-info {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: center;
+}
+
+/* Clamped, not left to grow unbounded — grid rows share height, so one oversized name would
+   otherwise stretch every card in that row to match. */
 .character-name {
     font-family: var(--font-bitpotion);
-    font-size: 3rem;
-    line-height: 1.05;
+    font-size: 3.46875rem;
+    line-height: 0.6;
     letter-spacing: 0.02em;
     color: var(--name-color);
     text-transform: uppercase;
-    margin-top: 0.3rem;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
 }
 
 /* Clamped to 2 lines regardless of ingredient count — at this font-size an unclamped 4-5
    ingredient recipe (one per line, given the column width) could add hundreds of px of height
-   per card, which — since the grid/card footprint is locked (RosterGrid.tsx) — only feeds
-   useFitToViewport's shrink-to-fit scale down, undoing the size increase for every card at
-   once just to accommodate the single longest ingredient list. */
+   to a single card, which — since grid rows share height — would stretch every card in that
+   row to match just to accommodate the single longest ingredient list. */
 .character-caption {
     font-family: var(--font-bitpotion);
-    font-size: 2.2rem;
+    font-size: 1.61rem;
     color: #9aa0b4;
-    margin-top: 0.25rem;
+    margin-top: 0.2rem;
+    line-height: 0.85;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
+/* Spirits get their own line below the flavor line, each prefixed with its IngredientGlyph
+   icon — mirrors .potion-base's flavor/spirit split in the Elixirs layout. margin-top: auto
+   pushes it to the bottom of .character-info (a flex column stretched to fill the card via
+   flex: 1 1 auto) instead of sitting directly under the flavor line. */
+.character-base {
+    font-family: var(--font-bitpotion);
+    font-size: 1.84rem;
+    color: #e8dfcd;
+    margin-top: auto;
     line-height: 1.2;
     display: -webkit-box;
     -webkit-box-orient: vertical;
@@ -766,38 +821,21 @@ body {
     overflow: hidden;
 }
 
-/* No./Price as a stat list rather than corner badges. */
-.character-stats {
-    width: 100%;
-    margin: 0.5rem 0 0;
-    padding-top: 0.4rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.14);
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
+/* Scoped to .character-base rather than .ingredient-glyph itself — that class is shared with
+   .potion-flavor/.potion-base in the Elixirs layout, which shouldn't shrink along with this. */
+.character-base .ingredient-glyph {
+    font-size: 0.7em;
+    vertical-align: middle;
 }
 
-.character-stat {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    font-family: var(--font-bitpotion);
-}
-
-.character-stat dt {
-    font-size: 2rem;
-    letter-spacing: 0.12em;
-    color: #9aa0b4;
-    text-transform: uppercase;
-}
-
-.character-stat dd {
-    margin: 0;
-    font-size: 2.6rem;
-    color: var(--gold);
-}
-
-.character-card.out-of-stock {
+/* Grayscaled per-element rather than filtering the whole card (see .potion-card's equivalent
+   rule) — that would also desaturate .out-of-stock-cross, whose ❌ glyph is red on purpose. */
+.character-card.out-of-stock .character-portrait,
+.character-card.out-of-stock .character-name,
+.character-card.out-of-stock .character-caption,
+.character-card.out-of-stock .character-base,
+.character-card.out-of-stock .character-index,
+.character-card.out-of-stock .character-price {
     filter: grayscale(1) brightness(0.55);
 }
 

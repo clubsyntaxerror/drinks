@@ -1,18 +1,18 @@
 "use client";
 
 import { useRef, type CSSProperties } from "react";
-import { useFitToViewport, useBalancedColumns } from "./utils/hooks";
+import { useBalancedColumns } from "./utils/hooks";
 import CharacterCard from "./CharacterCard";
 import type { Item } from "../app/drinksData";
 
-// Tuned (against a real 1920x1080 measurement, see git history) to land 9 items at 5 columns/2
-// rows rather than the algorithm's next bucket down (3 columns/3 rows) — useFitToViewport only
-// ever shrinks to fit (never grows), so a layout tall enough to need 3 rows gets scaled down
-// hard to fit the screen height, which shrinks the *text* along with it and defeats "bigger
-// cards, bigger text" at the same time. Fewer rows means less shrinking means both actually
-// land bigger. Kept in sync with .character-card in globals.css the same way MenuGrid keeps its
-// constant in sync with .potion-card.
-const MIN_CARD_WIDTH_PX = 220; // ~13.75rem
+// Deliberately lands 9 items at 3 columns/3 rows (not more columns) — .character-card stacks
+// portrait above text (see CharacterCard.tsx/globals.css), so packing it into many narrow
+// columns would make it too cramped. Measured against a *single* side's width
+// (useBalancedColumns runs on leftContainerRef,
+// ~half the screen once split into "This Side"/"That Side" below). Kept in sync with
+// .character-card in globals.css the same way MenuGrid keeps its constant in sync with
+// .potion-card.
+const MIN_CARD_WIDTH_PX = 230; // ~14.4rem
 const GRID_GAP_PX = 20; // 1.25rem
 
 // Mirrors MenuGrid's structure/props (same useFitToViewport contract) so the template registry
@@ -27,8 +27,6 @@ export default function RosterGrid({ items, fitToViewport = false }: { items: It
     const containerRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
     const leftContainerRef = useRef<HTMLDivElement>(null);
-
-    const scale = useFitToViewport(containerRef, contentRef, fitToViewport);
 
     const splitAt = Math.ceil(items.length / 2);
     const leftItems = items.slice(0, splitAt);
@@ -52,21 +50,10 @@ export default function RosterGrid({ items, fitToViewport = false }: { items: It
 
     return (
         <>
-            <div style={{ position: "fixed", top: 0, left: 0, background: "red", color: "white", zIndex: 999, fontSize: 20 }}>
-                DEBUG columns={columns} scale={scale} containerW={containerRef.current?.clientWidth} containerH={containerRef.current?.clientHeight} contentW={contentRef.current?.scrollWidth} contentH={contentRef.current?.scrollHeight}
-            </div>
             <div className="roster-side-plaque roster-side-plaque-left">This Side</div>
             <div className="roster-side-plaque roster-side-plaque-right">That Side</div>
             <div ref={containerRef} className={fitToViewport ? "roster-grid-viewport" : undefined}>
-                <div
-                    ref={contentRef}
-                    className="roster-groups"
-                    style={
-                        fitToViewport
-                            ? ({ transform: `scale(${scale})`, transformOrigin: "top center" } as CSSProperties)
-                            : undefined
-                    }
-                >
+                <div ref={contentRef} className="roster-groups">
                     <div ref={leftContainerRef} className="roster-group">
                         <div
                             className="roster-grid"
