@@ -379,7 +379,7 @@ export const sampleRecipes: Recipe[] = [
 ];
 
 export const sampleMessages: Message[] = [
-    { order: 1, text: "HAPPY HOUR BEER / CIDER / WINE / SPARKLING / SODA TO 23:00!", active: true },
+    { order: 1, text: "HAPPY HOUR: BEER, CIDER, WINE, SPARKLING & SODA UNTIL 23:00!", active: true },
     { order: 3, text: "DON'T FORGET TO PARTICIPATE IN THE QUIZ WALK!", active: true },
 ];
 
