@@ -34,7 +34,7 @@ export const sampleIngredients: Ingredient[] = [
     { id: "chili", name: "Chili", kind: "other", icon: undefined, color: "#dc2626", inStock: true },
     { id: "mint", name: "Mint", kind: "other", icon: undefined, color: "#0891b2", inStock: true },
     { id: "coconut", name: "Coconut", kind: "other", icon: undefined, color: "#f8fafc", inStock: false },
-    { id: "licorice", name: "Licorice", kind: "other", icon: undefined, color: "#6d28d9", inStock: true },
+    { id: "licorice", name: "Licorice", kind: "other", icon: undefined, color: "#2b1640", inStock: true },
     { id: "raspberry", name: "Raspberry", kind: "other", icon: undefined, color: "#be123c", inStock: true },
     { id: "strawberry", name: "Strawberry", kind: "other", icon: undefined, color: "#db2777", inStock: true },
     { id: "cotton-candy", name: "Cotton Candy", kind: "other", icon: undefined, color: "#f9a8d4", inStock: true },

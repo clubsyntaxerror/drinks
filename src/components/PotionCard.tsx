@@ -1,12 +1,22 @@
 import type { CSSProperties } from "react";
 import { PotionArt, IngredientGlyph, OutOfStockCross } from "./icons";
+import { withMinLightness } from "./utils/color";
 import type { Item } from "../app/drinksData";
 
 export default function PotionCard({ item, index }: { item: Item; index: number }) {
     return (
         <article
             className={`potion-card${item.outOfStock ? " out-of-stock" : ""}`}
-            style={{ "--accent": item.accentColor } as CSSProperties}
+            style={
+                {
+                    "--accent": item.accentColor,
+                    // The potion icon's tint can use the true accentColor (it has baked-in
+                    // shading to fall back on for contrast, per PotionArt), but flat name text
+                    // with a near-black accent (e.g. Shadow Potion) has nothing else to keep it
+                    // readable — clamp its lightness up instead.
+                    "--name-color": withMinLightness(item.accentColor, 50),
+                } as CSSProperties
+            }
         >
             <span className="potion-index">{String(index + 1).padStart(2, "0")}</span>
             <div className="potion-icon-wrap">

@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 // Bitmap potion art (public/assets/potion.png, 128x128, grayscale) replaces the earlier
 // hand-drawn SVG bottle. It's used three times over: as the base image (cork/neck/glass
 // outline/baked-in shading, always neutral), as a mask source for a colored overlay (so the
@@ -11,6 +13,10 @@
 // color (globals.css) preserves that shading instead of flattening the bulb to one flat tone.
 const POTION_ART_SRC = "/assets/potion.png";
 
+const EMBLEM_X = 64;
+const EMBLEM_Y = 84;
+const EMBLEM_FONT_SIZE = 28;
+
 export function PotionArt({
     color = "#e0a83e",
     emblem,
@@ -20,6 +26,9 @@ export function PotionArt({
     emblem?: string;
     className?: string;
 }) {
+    const emblemClipId = useId();
+    const emblemMosaicId = useId();
+
     return (
         <span className={className}>
             <img src={POTION_ART_SRC} alt="" aria-hidden="true" className="potion-art-base" />
@@ -33,17 +42,55 @@ export function PotionArt({
                 // widest, visually "roundest" cross-section of the bulb sits lower, around
                 // y=74-92, so centering there reads better than centering on the full bbox.
                 <svg viewBox="0 0 128 128" className="potion-art-emblem" aria-hidden="true">
+                    <defs>
+                        {/* SVG text can itself be a clipPath source — a second copy of the same
+                            glyph, used below to shape the color overlay to exactly the emblem's
+                            silhouette rather than a rectangle. */}
+                        <clipPath id={emblemClipId}>
+                            <text
+                                x={EMBLEM_X}
+                                y={EMBLEM_Y}
+                                textAnchor="middle"
+                                dominantBaseline="central"
+                                fontSize={EMBLEM_FONT_SIZE}
+                            >
+                                {emblem}
+                            </text>
+                        </clipPath>
+                        {/* A grid of small squares with gaps, instead of a flat fill, so the
+                            color overlay itself reads as a chunky pixel/mosaic tint rather than
+                            smooth vector color — matching the rest of the site's pixel-art look
+                            instead of looking anti-aliased next to it. patternUnits is in the
+                            same 128x128 user-space as everything else here. */}
+                        <pattern id={emblemMosaicId} width="4" height="4" patternUnits="userSpaceOnUse">
+                            <rect x="0" y="0" width="2.6" height="2.6" fill={color} />
+                        </pattern>
+                    </defs>
                     <text
-                        x="64"
-                        y="84"
+                        x={EMBLEM_X}
+                        y={EMBLEM_Y}
                         textAnchor="middle"
                         dominantBaseline="central"
-                        fontSize="34"
+                        fontSize={EMBLEM_FONT_SIZE}
                         opacity="0.9"
                         style={{ WebkitTextStroke: "2px #1a1206" }}
                     >
                         {emblem}
                     </text>
+                    {/* Tints the emblem toward the drink's accent color. mix-blend-mode: color
+                        takes the pattern's hue/saturation but keeps the emoji's own luminosity at
+                        each pixel (the backdrop, painted just above) — so it stays visible and
+                        properly shaded even for very dark accent colors, unlike a flat fill
+                        would. Clipped to the glyph shape above so only the emblem is tinted. */}
+                    <rect
+                        x="0"
+                        y="0"
+                        width="128"
+                        height="128"
+                        fill={`url(#${emblemMosaicId})`}
+                        clipPath={`url(#${emblemClipId})`}
+                        className="potion-art-emblem-tint"
+                    />
                 </svg>
             )}
             {/* Specular highlight: a plain radial-gradient white blob, masked to the same bulb
