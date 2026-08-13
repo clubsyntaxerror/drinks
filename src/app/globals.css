@@ -208,17 +208,10 @@ h3 {
     border-image-outset: 0;
     border-image-repeat: stretch;
     image-rendering: pixelated;
-    /* Same checkerboard-mosaic trick as the emblem tint (repeating-conic-gradient tiled small)
-       instead of a flat fill, plus a torch-orange glow (same rgba(255,150,60,...) as .torch)
-       positioned upper-left to match the light-source convention used everywhere else on the
-       card (the frame's rim-lit outline, the emblem's/gloss's own upper-left highlight) — reads
-       as the torchlight actually reaching into the card rather than every card being one flat,
-       uniformly dark rectangle. Confined tight to the corner (fades out by ~10-12% of the card)
-       rather than washing across most of it, so the rest of the card stays solid black. */
-    background:
-        radial-gradient(circle at 4% 4%, rgba(255, 150, 60, 0.35) 0%, transparent 12%),
-        repeating-conic-gradient(rgba(255, 255, 255, 0.04) 0% 25%, transparent 0% 50%) 0 0 / 6px 6px,
-        rgba(10, 8, 6, 0.92);
+    /* Reset to a flat fill on purpose — the corner glow + mosaic-texture gradients made the card
+       read as too smooth/high-quality against the rest of the pixel-art site. Starting over
+       from plain black at 70% opacity (i.e. 30% of the torch-lit background shows through). */
+    background: rgba(0, 0, 0, 0.7);
     padding: 1.25rem 0.9rem 0.85rem;
     text-align: center;
     box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.55);
@@ -294,24 +287,44 @@ h3 {
     bottom: -16px;
     left: -10px;
     pointer-events: none;
+    /* Fallback for browsers without mask-box-image support (Firefox — see below): a naive
+       whole-image stretch. This alone is what caused the mismatch: it doesn't know about
+       border-image's 9-slice geometry, so it scales frame.png's corners along with its edges
+       instead of keeping them at native size, and the resulting mask ring doesn't land where
+       the real border pixels are — parts of the actually-visible border fell outside it. */
     -webkit-mask-image: url("/assets/frame.png");
     mask-image: url("/assets/frame.png");
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%;
     -webkit-mask-repeat: no-repeat;
     mask-repeat: no-repeat;
+    /* mask-box-image is the masking equivalent of border-image — same slice/width/outset/repeat
+       model, so given .potion-card's own border-image-* values it lines up with the border
+       pixel-for-pixel instead of the naive stretch above. Chromium/Safari only (inherited from
+       WebKit, never standardized into the CSS Masking spec, Firefox doesn't implement it) —
+       browsers that don't understand these properties just ignore them and keep the fallback. */
+    -webkit-mask-box-image-source: url("/assets/frame.png");
+    -webkit-mask-box-image-slice: 12 11 16 10;
+    -webkit-mask-box-image-width: 12px 11px 16px 10px;
+    -webkit-mask-box-image-outset: 0;
+    -webkit-mask-box-image-repeat: stretch;
     mix-blend-mode: overlay;
+    /* Warm amber/orange glint (was white) over a more saturated orange wash (was pale gold) —
+       "not enough orange/yellow" — see .potion-card-frame-shine's keyframes for the slower,
+       hold-then-sweep timing ("too frequent" before: a continuous 4.5s back-and-forth). */
     background:
-        linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.95) 48%, transparent 66%),
-        rgba(224, 168, 62, 0.45);
+        linear-gradient(115deg, transparent 30%, rgba(255, 190, 90, 0.95) 48%, transparent 66%), rgba(230, 140, 40, 0.5);
     background-size:
         320% 320%,
         100% 100%;
     background-repeat: no-repeat;
-    animation: frame-shine-sweep 4.5s ease-in-out infinite;
+    animation: frame-shine-sweep 10s ease-in-out infinite;
 }
 
 @keyframes frame-shine-sweep {
+    /* Continuous glide across the whole 10s, not a hold-then-dart — the hold/pause version made
+       the actual movement fast and abrupt within a short window; a plain slow sweep the whole
+       cycle read better. */
     0%,
     100% {
         background-position:
