@@ -77,7 +77,7 @@ export const sampleRecipes: Recipe[] = [
     {
         order: 1,
         category: "elixirs",
-        name: "Health Potion",
+        name: "Health",
         emblem: "❤️",
         ingredientIds: ["vodka", "pomegranate"],
         tag: undefined,
@@ -87,7 +87,7 @@ export const sampleRecipes: Recipe[] = [
     {
         order: 2,
         category: "elixirs",
-        name: "Mana Potion",
+        name: "Mana",
         emblem: "⭐",
         ingredientIds: ["vodka", "blue-raspberry"],
         tag: undefined,
@@ -97,7 +97,7 @@ export const sampleRecipes: Recipe[] = [
     {
         order: 3,
         category: "elixirs",
-        name: "Stamina Potion",
+        name: "Stamina",
         emblem: "🍃",
         ingredientIds: ["gin", "kiwi", "green-apple"],
         tag: undefined,
@@ -117,7 +117,7 @@ export const sampleRecipes: Recipe[] = [
     {
         order: 5,
         category: "elixirs",
-        name: "Speed Potion",
+        name: "Speed",
         emblem: "⚡",
         ingredientIds: ["gin", "lemon", "yuzu"],
         tag: undefined,
@@ -127,7 +127,7 @@ export const sampleRecipes: Recipe[] = [
     {
         order: 6,
         category: "elixirs",
-        name: "Fire Resistance Potion",
+        name: "Fire Resistance",
         emblem: "🔥",
         ingredientIds: ["tequila", "mango", "chili"],
         tag: undefined,
@@ -137,7 +137,7 @@ export const sampleRecipes: Recipe[] = [
     {
         order: 7,
         category: "elixirs",
-        name: "Frost Resistance Potion",
+        name: "Frost Resistance",
         emblem: "❄️",
         ingredientIds: ["white-rum", "mint", "coconut"],
         tag: undefined,
@@ -147,7 +147,7 @@ export const sampleRecipes: Recipe[] = [
     {
         order: 8,
         category: "elixirs",
-        name: "Shadow Potion",
+        name: "Shadow",
         emblem: "🌙",
         ingredientIds: ["vodka", "licorice", "raspberry"],
         tag: undefined,
@@ -157,7 +157,7 @@ export const sampleRecipes: Recipe[] = [
     {
         order: 9,
         category: "elixirs",
-        name: "Love Potion",
+        name: "Love",
         emblem: "💗",
         ingredientIds: ["vodka", "strawberry", "cotton-candy"],
         tag: "new",
@@ -167,7 +167,7 @@ export const sampleRecipes: Recipe[] = [
     {
         order: 10,
         category: "elixirs",
-        name: "Luck Potion",
+        name: "Luck",
         emblem: "🍀",
         ingredientIds: ["gin", "pear", "grape"],
         tag: undefined,
