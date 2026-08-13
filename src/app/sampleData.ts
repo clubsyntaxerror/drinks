@@ -396,24 +396,24 @@ export const sampleMessages: Message[] = [
 ];
 
 export const sampleScreens: Screen[] = [
+    {
+        order: 1,
+        key: "elixirs",
+        title: "Elixirs",
+        subtitle: "Choose your potion",
+        durationSeconds: 1,
+        active: true,
+        template: "elixirs",
+    },
     // {
-    //     order: 1,
-    //     key: "elixirs",
-    //     title: "Elixirs",
-    //     subtitle: "Choose your potion",
+    //     order: 2,
+    //     key: "drinks",
+    //     title: "Drinks",
+    //     subtitle: "Choose your character",
     //     durationSeconds: 14,
     //     active: true,
-    //     template: "elixirs",
+    //     template: "drinks",
     // },
-    {
-        order: 2,
-        key: "drinks",
-        title: "Drinks",
-        subtitle: "Choose your character",
-        durationSeconds: 14,
-        active: true,
-        template: "drinks",
-    },
     // {
     //     order: 3,
     //     key: "basics",

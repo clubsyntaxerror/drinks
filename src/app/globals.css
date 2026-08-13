@@ -645,23 +645,44 @@ body {
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: center;
-    gap: 1.5rem;
+    gap: 2rem;
     width: 100%;
 }
 
 .roster-group {
-    flex: 1 1 320px;
+    flex: 1 1 420px;
     min-width: 0;
 }
 
-.roster-group-label {
+/* Corner "plaques" for the roster split — placeholder for real per-side artwork (a banner/crest
+   image) later, not just a text label. Pinned to the top corners of the whole screen (.menu-
+   screen, the nearest positioned ancestor — same row as the title/subtitle) rather than above
+   the grid itself, so they read as a screen-level frame element and don't eat into the grid's
+   own share of the available height. */
+.roster-side-plaque {
+    position: absolute;
+    top: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 9rem;
+    padding: 0.5rem 1.1rem;
+    border: 2px solid #4c2f7a;
+    background: rgba(10, 8, 6, 0.6);
     font-family: var(--font-bitpotion);
-    font-size: 1.2rem;
-    letter-spacing: 0.15em;
-    color: #9aa0b4;
+    font-size: 2.2rem;
+    letter-spacing: 0.12em;
+    color: #d8cff0;
     text-transform: uppercase;
     text-align: center;
-    margin-bottom: 0.6rem;
+}
+
+.roster-side-plaque-left {
+    left: 1.5rem;
+}
+
+.roster-side-plaque-right {
+    right: 1.5rem;
 }
 
 /* A plain vertical rule between the two "sides" — hidden once they wrap to a stacked layout
@@ -680,71 +701,100 @@ body {
 }
 
 @media (max-width: 700px) {
-    .roster-divider {
+    .roster-divider,
+    .roster-side-plaque {
         display: none;
     }
 }
 
 .roster-grid {
     display: grid;
-    gap: 0.75rem;
+    gap: 1.25rem;
     width: 100%;
 }
 
+/* No border for now (placeholder phase — a real frame is coming with bespoke art later); the
+   accent shows through the portrait/name/stats instead so cards don't read as flat/undefined
+   without one. */
 .character-card {
     --accent: #e0a83e;
     position: relative;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 1 / 1.6;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background: rgba(8, 9, 16, 0.78);
-    border: 2px solid var(--accent);
     border-radius: 4px;
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-    padding: 0.5rem 0.4rem 0.4rem;
+    padding: 1rem;
     text-align: center;
 }
 
-.character-index {
-    position: absolute;
-    top: 0.3rem;
-    left: 0.4rem;
-    font-family: var(--font-bitpotion);
-    font-size: 1rem;
-    color: #9aa0b4;
-}
-
-.character-price {
-    position: absolute;
-    top: 0.3rem;
-    right: 0.4rem;
-    font-family: var(--font-bitpotion);
-    font-size: 1rem;
-    color: var(--gold);
-}
-
 .character-portrait {
-    font-size: 2.6rem;
+    font-size: 6rem;
     line-height: 1;
 }
 
+/* Card footprint (grid/aspect-ratio) is locked — these are allowed to wrap onto more lines /
+   crowd the fixed box rather than stay a single tidy line, per explicit request. */
 .character-name {
     font-family: var(--font-bitpotion);
-    font-size: 1.15rem;
+    font-size: 3rem;
+    line-height: 1.05;
     letter-spacing: 0.02em;
     color: var(--name-color);
     text-transform: uppercase;
-    margin-top: 0.4rem;
+    margin-top: 0.3rem;
 }
 
+/* Clamped to 2 lines regardless of ingredient count — at this font-size an unclamped 4-5
+   ingredient recipe (one per line, given the column width) could add hundreds of px of height
+   per card, which — since the grid/card footprint is locked (RosterGrid.tsx) — only feeds
+   useFitToViewport's shrink-to-fit scale down, undoing the size increase for every card at
+   once just to accommodate the single longest ingredient list. */
 .character-caption {
     font-family: var(--font-bitpotion);
-    font-size: 0.7rem;
+    font-size: 2.2rem;
     color: #9aa0b4;
-    margin-top: 0.15rem;
+    margin-top: 0.25rem;
     line-height: 1.2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
+/* No./Price as a stat list rather than corner badges. */
+.character-stats {
+    width: 100%;
+    margin: 0.5rem 0 0;
+    padding-top: 0.4rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.character-stat {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    font-family: var(--font-bitpotion);
+}
+
+.character-stat dt {
+    font-size: 2rem;
+    letter-spacing: 0.12em;
+    color: #9aa0b4;
+    text-transform: uppercase;
+}
+
+.character-stat dd {
+    margin: 0;
+    font-size: 2.6rem;
+    color: var(--gold);
 }
 
 .character-card.out-of-stock {

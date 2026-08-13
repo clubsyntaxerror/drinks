@@ -18,8 +18,6 @@ export default function CharacterCard({ item, index }: { item: Item; index: numb
                 } as CSSProperties
             }
         >
-            <span className="character-index">{String(index + 1).padStart(2, "0")}</span>
-            {item.price !== undefined && <span className="character-price">{item.price}:-</span>}
             <div className="character-portrait" aria-hidden="true">
                 {item.emblem ?? "❔"}
             </div>
@@ -29,6 +27,20 @@ export default function CharacterCard({ item, index }: { item: Item; index: numb
                     {[...item.flavors, ...item.spirits].map((ingredient) => ingredient.name).join(" · ")}
                 </p>
             )}
+            {/* No./Price as a "character stat" list rather than corner badges — reads more like
+                a fighting-game bio (HP/POWER/...) than a potion card's index number. */}
+            <dl className="character-stats">
+                <div className="character-stat">
+                    <dt>No.</dt>
+                    <dd>{String(index + 1).padStart(2, "0")}</dd>
+                </div>
+                {item.price !== undefined && (
+                    <div className="character-stat">
+                        <dt>Price</dt>
+                        <dd>{item.price}:-</dd>
+                    </div>
+                )}
+            </dl>
             {item.outOfStock && <OutOfStockCross className="out-of-stock-cross" />}
         </article>
     );
