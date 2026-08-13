@@ -6,6 +6,8 @@ module.exports = {
             fontFamily: {
                 display: ["var(--font-display)"],
                 body: ["var(--font-body)"],
+                bitpotion: ["var(--font-bitpotion)"],
+                lamano: ["var(--font-lamano)"],
             },
         },
     },

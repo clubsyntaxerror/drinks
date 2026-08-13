@@ -140,7 +140,7 @@ h3 {
 }
 
 .screen-eyebrow {
-    font-family: var(--font-display);
+    font-family: var(--font-bitpotion);
     font-size: clamp(0.6rem, 1.4vw, 0.9rem);
     letter-spacing: 0.35em;
     color: #8d8477;
@@ -148,7 +148,7 @@ h3 {
 }
 
 .screen-title {
-    font-family: var(--font-display);
+    font-family: var(--font-lamano);
     font-size: clamp(1.6rem, 5.5vw, 3.4rem);
     line-height: 1.3;
     color: var(--gold);
@@ -159,7 +159,7 @@ h3 {
 }
 
 .screen-subtitle {
-    font-family: var(--font-body);
+    font-family: var(--font-bitpotion);
     font-size: clamp(1rem, 2.2vw, 1.4rem);
     letter-spacing: 0.2em;
     color: #cfc7b8;
@@ -169,7 +169,7 @@ h3 {
 
 .screen-price {
     display: inline-block;
-    font-family: var(--font-body);
+    font-family: var(--font-bitpotion);
     font-size: clamp(0.9rem, 1.8vw, 1.15rem);
     letter-spacing: 0.15em;
     color: var(--gold);
@@ -209,17 +209,22 @@ h3 {
     aspect-ratio: 3 / 4;
     display: flex;
     flex-direction: column;
-    /* A diagonal gradient run through border-image reads as a beveled metal frame for free:
-       each edge/corner samples a different part of the gradient, so top-left comes out lit
-       and bottom-right comes out shadowed, no bitmap needed. */
-    border: 3px solid transparent;
-    border-image: linear-gradient(135deg, #f3d99a 0%, #b8873a 32%, #6b4c1e 68%, #2b1d0c 100%) 1;
-    background:
-        radial-gradient(circle 3px at 7px 7px, #f3d99a 92%, transparent 100%),
-        radial-gradient(circle 3px at calc(100% - 7px) 7px, #f3d99a 92%, transparent 100%),
-        radial-gradient(circle 3px at 7px calc(100% - 7px), #f3d99a 92%, transparent 100%),
-        radial-gradient(circle 3px at calc(100% - 7px) calc(100% - 7px), #f3d99a 92%, transparent 100%),
-        rgba(10, 8, 6, 0.72);
+    /* public/assets/frame.png is a 192x256 ornate bitmap frame — exactly the same 3:4 ratio as
+       the card, so it maps on with no distortion. Slice values were measured pixel-by-pixel
+       from the source (top 12 / right 11 / bottom 16 / left 10) rather than eyeballed, so the
+       corners land where the art's own corner flourishes are instead of stretching through
+       them. It's grayscale on purpose (see PotionArt) — the frame stays neutral for every
+       drink; only the potion's content picks up the accent color. */
+    border-style: solid;
+    border-width: 12px 11px 16px 10px;
+    border-color: transparent;
+    border-image-source: url("/assets/frame.png");
+    border-image-slice: 12 11 16 10;
+    border-image-width: 12px 11px 16px 10px;
+    border-image-outset: 0;
+    border-image-repeat: stretch;
+    image-rendering: pixelated;
+    background: rgba(10, 8, 6, 0.72);
     padding: 1.25rem 0.9rem 0.85rem;
     text-align: center;
     box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.55);
@@ -276,13 +281,13 @@ h3 {
 }
 
 .potion-icon-wrap {
-    height: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .potion-body {
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -305,17 +310,11 @@ h3 {
     pointer-events: none;
 }
 
-/* "Dead" card: the frame itself desaturates (not just the icon/name/flavor/base above) and
-   stops catching torchlight — a plain static bevel instead of frame-flicker's warm highlight. */
+/* "Dead" card: stops catching torchlight — a plain static bevel instead of frame-flicker's
+   warm highlight. frame.png is already neutral grayscale, so unlike the old CSS-gradient
+   frame there's no separate desaturated version to swap in here. */
 .potion-card.out-of-stock {
     animation: none;
-    border-image: linear-gradient(135deg, #9c9890 0%, #726e66 32%, #454239 68%, #1c1a16 100%) 1;
-    background:
-        radial-gradient(circle 3px at 7px 7px, #9c9890 92%, transparent 100%),
-        radial-gradient(circle 3px at calc(100% - 7px) 7px, #9c9890 92%, transparent 100%),
-        radial-gradient(circle 3px at 7px calc(100% - 7px), #9c9890 92%, transparent 100%),
-        radial-gradient(circle 3px at calc(100% - 7px) calc(100% - 7px), #9c9890 92%, transparent 100%),
-        rgba(10, 8, 6, 0.72);
     box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.6);
 }
 
@@ -323,50 +322,142 @@ h3 {
     position: absolute;
     top: 0.4rem;
     left: 0.7rem;
-    font-family: var(--font-body);
-    font-size: 1.4rem;
-    color: #e8dfcd;
+    font-family: var(--font-bitpotion);
+    font-size: 2.1rem;
+    color: #8d8477;
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
 }
 
+/* Sized by width, not height: frame.png (192x256) is stretched 1:1 onto the card's own
+   border-box, so a card of width W renders the frame at scale W/192. For potion.png (128x128)
+   to render at that *same* scale — rather than an arbitrary fraction of the card picked by eye
+   — it needs width = (128/192) of that same reference width, with height following via
+   aspect-ratio. The old approach sized this off 50% of the flex content *height* instead, which
+   is smaller than the card's true width-based scale once the card's own border+padding are
+   subtracted out — that's why the potion looked undersized relative to the frame. */
 .potion-icon {
+    position: relative;
+    display: block;
+    width: calc(100% * 128 / 192);
+    height: auto;
+    aspect-ratio: 1 / 1; /* potion.png is 128x128 */
+}
+
+.potion-art-base {
+    position: absolute;
+    inset: 0;
+    width: 100%;
     height: 100%;
-    width: auto;
-    aspect-ratio: 24 / 30; /* matches PotionIcon's viewBox so height:100% sizes width correctly */
+    image-rendering: pixelated;
+}
+
+/* mix-blend-mode: multiply, not "color" — "color" keeps the *backdrop's* lightness and only
+   borrows hue/saturation from the tint, and the bulb's interior fill is ~93% white, so it stayed
+   washed out near-white no matter how saturated the tint was. multiply scales every backdrop
+   pixel toward the tint color instead: near-white areas take the full accent color, the near-
+   black outline and darker shading bands scale it down proportionally — vivid tinting that still
+   tracks potion.png's baked-in shading. mask-image reuses the same PNG's alpha silhouette so the
+   tint is clipped to the bottle shape, and clip-path additionally cuts off the top ~23% (cork +
+   neck, measured from the source) so only the round bulb — the "content" — picks up color; the
+   vessel itself stays neutral, same as the reference image. */
+.potion-art-tint {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    mix-blend-mode: multiply;
+    -webkit-mask-image: url("/assets/potion.png");
+    mask-image: url("/assets/potion.png");
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    image-rendering: pixelated;
+    /* 23% is the measured neck-to-bulb line; cutting the tint off lower, at 37%, leaves a
+       visible headspace band of neutral (untinted) glass between the neck and the liquid —
+       the potion reads as not-quite-full instead of colored solid right up to the cork. The
+       shine layer below keeps its own clip at 23% since that's light on the glass itself,
+       which is there whether or not the bottle is topped up. */
+    clip-path: inset(37% 0 0 0);
+    /* Shrinks the masked silhouette in from its center by a few percent so the fill stops
+       just short of the glass outline instead of covering it — the outline and a thin ring
+       of edge pixels stay the base image's neutral white/gray instead of getting tinted.
+       translate() is listed before scale() so its 2px offset is applied in unscaled pixels
+       (transform functions apply right-to-left) — a couple of pixels down/right, not
+       0.94x'd down to ~1.9px — nudging the fill off-center from the outline for a cheap
+       fake-3D/embossed look. */
+    transform: translate(2px, 2px) scale(0.94);
+    transform-origin: center;
+}
+
+.potion-art-emblem {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* Specular highlight: a plain white radial gradient (bright core fading to nothing by ~55%),
+   masked to the same bulb silhouette as the tint so it doesn't spill past the glass, positioned
+   upper-left to match the light-source convention used elsewhere (the frame's rim-lit outline,
+   the torch positions). This alone reads as a glass glint without needing separate art. */
+.potion-art-shine {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        circle at 32% 32%,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(255, 255, 255, 0.25) 30%,
+        transparent 55%
+    );
+    -webkit-mask-image: url("/assets/potion.png");
+    mask-image: url("/assets/potion.png");
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    clip-path: inset(23% 0 0 0);
 }
 
 .potion-name {
-    font-family: var(--font-body);
-    font-size: 1.9rem;
-    line-height: 1.15;
+    font-family: var(--font-bitpotion);
+    font-size: 2.85rem;
+    line-height: 0.7;
     /* Reserves two lines' height so a wrapped name doesn't push this card's flavor/spirit
        rows out of alignment with shorter, single-line names in the same grid row. */
-    min-height: 2.3em;
+    min-height: 1.4em;
     letter-spacing: 0.03em;
     color: var(--accent);
     text-transform: uppercase;
 }
 
 .potion-flavor {
-    font-family: var(--font-body);
-    font-size: 1.35rem;
+    font-family: var(--font-bitpotion);
+    font-size: 2.03rem;
+    line-height: 0.7;
     color: #cfc7b8;
     margin-top: 0.15rem;
 }
 
 .potion-base {
-    font-family: var(--font-body);
-    font-size: 1.2rem;
+    font-family: var(--font-bitpotion);
+    font-size: 1.8rem;
+    line-height: 0.7;
     letter-spacing: 0.15em;
-    color: #8d8477;
+    color: #e8dfcd;
     text-transform: uppercase;
-    margin-top: 0.5rem;
+    /* Pushes itself to the bottom of .potion-body (now stretched to fill the card via flex: 1
+       above) instead of sitting directly under the flavor line — auto margins consume all
+       available space above them in a flex column. */
+    margin-top: auto;
     border-top: 1px solid #241f18;
     padding-top: 0.4rem;
 }
 
 .ingredient-glyph {
-    margin-right: 0.25rem;
+    margin-right: 0.05rem;
 }
 
 /* Scrollbox */
@@ -380,7 +471,7 @@ h3 {
     align-items: center;
     justify-content: center;
     text-align: center;
-    font-family: var(--font-body);
+    font-family: var(--font-bitpotion);
     font-size: clamp(1rem, 2vw, 1.3rem);
     color: #d8cff0;
     letter-spacing: 0.05em;
@@ -401,7 +492,7 @@ h3 {
 }
 
 .mobile-title {
-    font-family: var(--font-display);
+    font-family: var(--font-lamano);
     font-size: clamp(2rem, 9vw, 3.2rem);
     color: var(--gold);
     text-shadow: 0 0 16px rgba(224, 168, 62, 0.45);
@@ -460,7 +551,7 @@ h3 {
     bottom: 0.75rem;
     right: 0.75rem;
     z-index: 10;
-    font-family: var(--font-body);
+    font-family: var(--font-bitpotion);
     font-size: 0.9rem;
     letter-spacing: 0.05em;
     color: #171310;
