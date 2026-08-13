@@ -1,6 +1,23 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Minimal reset (Tailwind's preflight is gone along with the rest of Tailwind — these two
+   rules are the load-bearing parts of it the rest of this file was written assuming: border-box
+   sizing is what makes .potion-card's `aspect-ratio` + `padding` combination render at the
+   intended proportions, and the margin reset keeps browser default <p>/<h*> spacing from
+   stacking on top of every explicit margin already set below (.screen-subtitle, .potion-flavor,
+   .potion-base, etc). Without these, cards render squashed and text blocks pick up extra,
+   untuned gaps. */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body,
+h1,
+h2,
+h3,
+p {
+    margin: 0;
+}
 
 :root {
     --ink: #050403;
@@ -18,12 +35,7 @@ body {
     color: #f2ece0;
     background: var(--ink);
     overflow-x: hidden;
-}
-
-h1,
-h2,
-h3 {
-    margin: 0;
+    font-family: var(--font-bitpotion);
 }
 
 /* Background: an optional photo (TV route only, see Background.tsx), a translucent
@@ -215,7 +227,8 @@ h3 {
         /* Reset to a flat fill on purpose — the corner glow + mosaic-texture gradients made the
            card read as too smooth/high-quality against the rest of the pixel-art site. Starting
            over from plain black at 70% opacity (i.e. 30% of the torch-lit background shows
-           through). */ rgba(0, 0, 0, 0.7);
+           through). */
+        rgba(0, 0, 0, 0.7);
     image-rendering: pixelated;
     /* Left/right padding clears the frame's plain vertical bar (~10-16px thick) with room to
        spare — the same reasoning as .potion-index/.potion-price's own inset, just sized for
@@ -546,7 +559,12 @@ h3 {
 
 .potion-name {
     font-family: var(--font-bitpotion);
-    font-size: 4.95rem;
+    /* clamp(), not a flat rem, so long names (e.g. "Fire Resistance") shrink to fit on the
+       mobile route's narrow, unscaled 2-column cards instead of overflowing past the card
+       edge — the TV route doesn't need the vw term since its cards are already scaled as a
+       whole by useFitToViewport, and 5.5vw exceeds the 4.95rem cap at any TV-sized viewport
+       anyway, so this renders identically to a flat 4.95rem there. */
+    font-size: clamp(1.6rem, 5.5vw, 4.95rem);
     line-height: 0.7;
     /* No min-height reservation for a second line on purpose: it kept flavor/spirit rows
        aligned across a row when names wrap unevenly, but it also left a visible gap under
@@ -554,17 +572,18 @@ h3 {
        sits right under whatever height the name actually takes. */
     letter-spacing: 0.03em;
     /* --name-color (PotionCard.tsx) is --accent with its lightness clamped to a minimum of
-       50% — flat text has no baked-in shading to keep a near-black accent (e.g. Shadow
-       Potion) readable, unlike the potion icon's tint. The text-stroke is extra insurance
-       against the equally-dark card background on top of that. */
+       50% — flat text has no baked-in shading to keep a near-black accent (e.g. Shadow)
+       readable, unlike the potion icon's tint. (A -webkit-text-stroke used to sit here as
+       extra insurance on top of that, but at this font-size it read as a pale halo that
+       washed out the accent color rather than helping — the lightness clamp alone is enough
+       to stay legible against the card's own black background, per Shadow above.) */
     color: var(--name-color);
     text-transform: uppercase;
-    -webkit-text-stroke: 0.15px #cfc7b8;
 }
 
 .potion-flavor {
     font-family: var(--font-bitpotion);
-    font-size: 2.35rem;
+    font-size: clamp(0.9rem, 2.6vw, 2.35rem);
     line-height: 0.7;
     color: #cfc7b8;
     margin-top: 0.15rem;
@@ -572,7 +591,7 @@ h3 {
 
 .potion-base {
     font-family: var(--font-bitpotion);
-    font-size: 2.15rem;
+    font-size: clamp(0.85rem, 2.35vw, 2.15rem);
     line-height: 0.7;
     letter-spacing: 0.15em;
     color: #e8dfcd;

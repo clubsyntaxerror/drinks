@@ -31,6 +31,9 @@ export function PotionArt({
 
     return (
         <span className={className}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- small local pixel-art asset used
+                as a decorative mask/tint base (see file header); next/image's optimization pipeline
+                isn't a fit and could interfere with image-rendering: pixelated. */}
             <img src={POTION_ART_SRC} alt="" aria-hidden="true" className="potion-art-base" />
             {/* Pre-darkens the fill area before the tint blends against it — see the long
                 comment on .potion-art-fill-shade in globals.css for why: overlay's "maximum

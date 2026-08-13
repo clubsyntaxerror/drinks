@@ -2,7 +2,7 @@
 
 Digital drinks/elixirs menu for Club Syntax Error, built for a TV screen behind the bar and for mobile phones. Retro dungeon-crawler item-screen style (potion bottles, stone wall, torches), matching `reference/elixirs.jpg`.
 
-Sibling project to [`syntaxerrorsthlm/website`](../website) — same tech stack (Next.js, React, TypeScript, Tailwind, `googleapis`), but a separate app with its own separate Google Sheet as its CMS.
+Sibling project to [`syntaxerrorsthlm/website`](../website) — same tech stack (Next.js, React, TypeScript, `googleapis`), but a separate app with its own separate Google Sheet as its CMS. Styling is plain hand-written CSS, not Tailwind (unlike `website`).
 
 ## What this is
 
@@ -18,13 +18,13 @@ Three screens today, cycling in this order on `/tv` and stacked in this order on
 2. **Drinks** — other cocktails
 3. **The Basics** _(working title — beers, ciders, wines, sparkling wines, sodas)_
 
-Screens are driven from the sheet's `Screens` tab, so this list (name, order, timing) can change without a code deploy. Pricing is one value per screen (e.g. "139 kr each" in the header) rather than per card, since every item on a screen costs the same — matching the reference image, which shows no price on individual cards.
+Screens are driven from the sheet's `Screens` tab, so this list (name, order, timing) can change without a code deploy. Each item can carry its own price, shown on the card itself (e.g. "139:-").
 
 ## Look & feel
 
 - Landscape-only layout (no dedicated portrait/phone-holder mode)
 - Animated background via CSS pixel-flicker (torches etc.), no video loop for v1
-- `/tv` layers a static photo (`public/assets/background.jpg`) under the flicker/tint for extra atmosphere; drop the file in at that path — the code already references it, it just doesn't exist yet. The mobile route (`/`) stays flicker-only.
+- `/tv` layers a static photo (`public/assets/background.jpg`) under the flicker/tint for extra atmosphere. The mobile route (`/`) stays flicker-only.
 - New pixel font + new potion-bottle/spirit icon set, purpose-built for this menu (not reused from `website`)
 
 ## Data source
@@ -55,31 +55,37 @@ The drinks spreadsheet needs four tabs, header row included. Drinks don't carry 
 - `icon` is optional (an emoji works fine); blank falls back to a keyword-matched glyph or nothing.
 - `inStock` — set to `FALSE` to instantly cross out every drink containing this ingredient.
 
-**`Items`** — the drinks/elixirs/basics themselves (no price column — see `Screens` below):
+**`Items`** — the drinks/elixirs/basics themselves:
 
-| order | category  | name          | emblem | ingredientIds       | tag | active |
-| ----- | --------- | ------------- | ------ | ------------------- | --- | ------ |
-| `1`   | `elixirs` | Health Potion | ❤️     | `vodka,pomegranate` |     | `TRUE` |
+| order | category  | name          | emblem | ingredientIds       | tag | active | price |
+| ----- | --------- | ------------- | ------ | ------------------- | --- | ------ | ----- |
+| `1`   | `elixirs` | Health Potion | ❤️     | `vodka,pomegranate` |     | `TRUE` | `139` |
 
 - `category` matches a `Screens.key` below.
 - `emblem` is optional — an emoji embossed into the potion icon's liquid (e.g. ❤️ for Health Potion, matching `reference/elixirs.jpg`). Blank just omits it.
 - `ingredientIds` is a comma-separated list of `Ingredients.id` values — one or more spirits, one or more others.
+- `price` is optional — a plain number, no currency symbol. Shown on the card as e.g. "139:-"; leave blank for an item with no listed price.
 
 **`Messages`** — scrollbox content:
 
-| order | text                                         | active |
-| ----- | -------------------------------------------- | ------ |
-| `1`   | Happy hour 18:00–20:00 — 20% off all Elixirs | `TRUE` |
+| order | text                                          | active | fromTime | toTime  |
+| ----- | --------------------------------------------- | ------ | -------- | ------- |
+| `1`   | Happy hour 18:00–20:00 — 20% off all Elixirs  | `TRUE` |          |         |
+| `2`   | Happy hour: beer/cider/wine/soda until 23:00! | `TRUE` |          | `23:00` |
 
-**`Screens`** — drives cycling order/timing on `/tv` and section order on `/`, and carries the one price shown for everything on that screen:
+- `fromTime`/`toTime` are both optional `HH:MM` bounds on when a message shows — leave either blank to leave that side open. Outside the window it just doesn't show; no need to flip `active` by hand.
+- The venue's day runs 03:00 → 03:00 the next morning (last call, closing, etc. all land after midnight), so `fromTime: 01:00` means "from just after midnight," not "any time after 1am the previous afternoon." See `isWithinDailyWindow` in `src/components/utils/time.ts`.
+- Re-checked in the browser once a minute, so a message scheduled to end at 23:00 drops off the TV on its own, without a page reload.
 
-| order | key       | title      | subtitle                   | price    | durationSeconds | active |
-| ----- | --------- | ---------- | -------------------------- | -------- | --------------- | ------ |
-| `1`   | `elixirs` | Elixirs    | Choose your potion         | `139 kr` | `14`            | `TRUE` |
-| `2`   | `drinks`  | Drinks     | Classic & signature        | `149 kr` | `14`            | `TRUE` |
-| `3`   | `basics`  | The Basics | Beer · Cider · Wine · Soda | `79 kr`  | `14`            | `TRUE` |
+**`Screens`** — drives cycling order/timing on `/tv` and section order on `/`:
 
-Until the spreadsheet exists (or env vars aren't set), the site falls back to bundled sample data (`src/app/sampleData.ts`) so `npm run dev` always renders a real-looking menu — a small gold "Sample data" badge appears in that case as a reminder.
+| order | key       | title      | subtitle                   | durationSeconds | active |
+| ----- | --------- | ---------- | -------------------------- | --------------- | ------ |
+| `1`   | `elixirs` | Elixirs    | Choose your potion         | `14`            | `TRUE` |
+| `2`   | `drinks`  | Drinks     | Classic & signature        | `14`            | `TRUE` |
+| `3`   | `basics`  | The Basics | Beer · Cider · Wine · Soda | `14`            | `TRUE` |
+
+Until the spreadsheet exists (or env vars aren't set), the site falls back to bundled sample data (`src/app/sampleData.ts`) so `npm run dev` always renders a real-looking menu.
 
 ## Deploy
 

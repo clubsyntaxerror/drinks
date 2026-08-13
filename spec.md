@@ -24,7 +24,7 @@ Chosen to match the existing sibling repo so both are maintainable by the same p
 
 - **Next.js 15** (App Router, `next dev --turbopack`)
 - **React 19**, **TypeScript** (strict)
-- **Tailwind CSS 3** for styling, same `.prettierrc` / prettier setup
+- Plain hand-written CSS (`globals.css`) for styling, same `.prettierrc` / prettier setup — no Tailwind (dropped: the pixel-art card/frame/grid styling ended up entirely bespoke, so a utility-class framework wasn't pulling its weight)
 - **`googleapis`** with a Google service-account JWT for **read-only** Sheets access — same auth pattern as `src/app/eventData.ts`
 - **`@vercel/analytics`**, deploy target Vercel — same org as `website`, new subdomain (e.g. `menu.syntax-error.se`)
 - A **new**, dungeon-style pixel font and a **new**, purpose-built potion-bottle/spirit icon set (not reused from `website` — see §10)
@@ -92,6 +92,7 @@ name                 string
 ingredientIds     string[] — comma-separated ids into the Ingredient inventory (one or more spirits, one or more other ingredients)
 tag                  string?  — e.g. "new", "seasonal"
 active               boolean  — hide without deleting the row
+price                number?  — this item's price, e.g. 139; shown on its card as "139:-". Optional — blank just omits it
 ```
 
 ### Composed item (derived at request time, not stored)
@@ -104,7 +105,11 @@ A Recipe resolved against the Ingredient inventory: its ingredients split into `
 order      number
 text        string
 active      boolean
+fromTime  string?  — "HH:MM", message only shows from this time onward
+toTime     string?  — "HH:MM", message stops showing at this time
 ```
+
+`fromTime`/`toTime` are checked against the venue's _day_, not the calendar day: the day is treated as running 03:00 → 03:00 the next morning, so a `fromTime` of "01:00" means "from just after midnight," not "any time after 1am the previous afternoon" (see `isWithinDailyWindow` in `src/components/utils/time.ts`). Re-checked client-side once a minute, so a message drops off the live TV/mobile view on its own when its window ends, without a page reload or waiting on server revalidation.
 
 ### Screen (drives cycling + section order)
 
@@ -113,12 +118,11 @@ order              number
 key                 string   — matches a Recipe.category value
 title               string   — screen header text, e.g. "Elixirs", "Drinks"
 subtitle            string?  — e.g. "Choose your potion"
-price               string?  — one price for everything on this screen, e.g. "139 kr" — shown once in the screen header, not per card
 durationSeconds  number   — how long this screen stays up in TV mode
 active              boolean
 ```
 
-**Pricing is per-screen, not per-drink** (revised after the first visual pass): every item on a screen costs the same, so the price lives on `Screen` and is shown once in `ScreenHeader` (e.g. "139 kr each"), not repeated on every `PotionCard`. This also matches the reference image, which shows no price on individual cards at all.
+**Pricing is per-item, not per-screen** (revised again after the price-per-drink request came in): each `Recipe` carries its own optional `price`, rendered on its `PotionCard` (e.g. "139:-"). An earlier design had one shared price per `Screen`, shown once in `ScreenHeader` — that field has been removed; per-item pricing supersedes it.
 
 Fetchers follow `website`'s `Event` type pattern (typed row-mapping function, `undefined`-safe optional columns, `cache()`-wrapped, `revalidate`-driven).
 
@@ -129,7 +133,7 @@ Confirmed screens for launch: **Elixirs**, **Drinks**, and a third screen coveri
 - **New, separate spreadsheet** — not a new tab on the existing Events sheet — so the bar team can be given edit access to just this file.
 - Same service account can be reused (share the new spreadsheet with the existing `GOOGLE_SHEETS_CLIENT_EMAIL`) or a fresh service account can be created — either works technically; reusing is simpler ops-wise.
 - New env var: `DRINKS_SPREADSHEET_ID` (parallel to `website`'s `SPREADSHEET_ID`).
-- Tabs: `Items`, `Messages`, `Screens` (§8), fetched with `sheets.spreadsheets.values.get({ range: "<TabName>" })`, one call per tab, each wrapped in React's `cache()` like `getEvents`.
+- Tabs: `Ingredients`, `Items`, `Messages`, `Screens` (§8), fetched with `sheets.spreadsheets.values.get({ range: "<TabName>" })`, one call per tab, each wrapped in React's `cache()` like `getEvents`.
 - Revalidation: same `revalidate = N` + `/api/revalidate` route pattern as `website`, but with a **much shorter window** than the 3600s used for events — periodic refresh (target ~120s) was chosen over building an instant Apps-Script-webhook path, so a sheet edit shows up on the TV within roughly two minutes with no extra moving parts.
 
 ## 10. Images & icons — can images be embedded in a Sheets cell?
@@ -158,7 +162,7 @@ Two Sheets mechanisms exist, and neither is a good fit as the primary path:
 Resolved:
 
 - Screens: Elixirs, Drinks, and a beer/cider/wine/sparkling/soda screen (working title "The Basics")
-- Prices: one per screen (e.g. "139 kr each" in the header), not per card — revised after the first visual pass, see §8
+- Prices: per item, shown on its card (e.g. "139:-") — revised twice: first to one shared price per screen, then back to per-item after a later request, see §8
 - Fonts/icons: bespoke new pixel font + new potion-bottle/spirit icon set, not reused from `website`
 - Background: CSS pixel-flicker, no video for v1; `/tv` additionally layers a static photo under the flicker (see §7)
 - Update cadence: periodic revalidate (~120s), no Apps Script webhook
@@ -172,4 +176,4 @@ Still genuinely open (don't block scaffolding, but need answers before final pol
 1. **TV playback hardware** — smart TV browser vs. streaming stick/kiosk box is still undecided. Doesn't change the build since the CSS background has no special hardware requirements either way.
 2. **Final name for the third screen** — "The Basics" is a placeholder; needs a name in the same voice as "Elixirs".
 3. **Who produces the new font + icon set, and how** — AI-generated (like the reference image), commissioned pixel artist, or an existing icon pack adapted to a shared palette. Blocks final visual polish, not initial scaffolding (placeholders can stand in).
-4. **Price formatting** — plain string per item is flexible enough to start; whether currency/formatting conventions need to be more structured can be revisited once real menu data exists.
+4. ~~**Price formatting**~~ — resolved: `Recipe.price` is a plain number (not a free-form string), rendered as `{price}:-` (":-" being the common Swedish shorthand for SEK).

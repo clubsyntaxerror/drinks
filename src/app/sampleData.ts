@@ -354,7 +354,16 @@ export const sampleRecipes: Recipe[] = [
         active: true,
         price: 79,
     },
-    { order: 2, category: "basics", name: "IPA", emblem: "🍺", ingredientIds: ["ipa"], tag: undefined, active: true, price: 89 },
+    {
+        order: 2,
+        category: "basics",
+        name: "IPA",
+        emblem: "🍺",
+        ingredientIds: ["ipa"],
+        tag: undefined,
+        active: true,
+        price: 89,
+    },
     {
         order: 3,
         category: "basics",
@@ -375,7 +384,16 @@ export const sampleRecipes: Recipe[] = [
         active: true,
         price: 99,
     },
-    { order: 5, category: "basics", name: "Soda", emblem: "🥤", ingredientIds: ["soda"], tag: undefined, active: true, price: 49 },
+    {
+        order: 5,
+        category: "basics",
+        name: "Soda",
+        emblem: "🥤",
+        ingredientIds: ["soda"],
+        tag: undefined,
+        active: true,
+        price: 49,
+    },
 ];
 
 export const sampleMessages: Message[] = [
@@ -387,11 +405,19 @@ export const sampleMessages: Message[] = [
         toTime: "23:00",
     },
     {
-        order: 2, text: "WELCOME TO SYNTAX ERROR!", active: true,
+        order: 2,
+        text: "WELCOME TO SYNTAX ERROR!",
+        active: true,
         fromTime: undefined,
-        toTime: undefined
+        toTime: undefined,
     },
-    { order: 3, text: "DON'T FORGET TO PARTICIPATE IN THE QUIZ WALK!", active: true, fromTime: undefined, toTime: "01:00" },
+    {
+        order: 3,
+        text: "DON'T FORGET TO PARTICIPATE IN THE QUIZ WALK!",
+        active: true,
+        fromTime: undefined,
+        toTime: "01:00",
+    },
 ];
 
 export const sampleScreens: Screen[] = [
@@ -400,7 +426,6 @@ export const sampleScreens: Screen[] = [
         key: "elixirs",
         title: "Elixirs",
         subtitle: "Choose your potion",
-        price: "139 kr",
         durationSeconds: 14,
         active: true,
     },
@@ -409,7 +434,6 @@ export const sampleScreens: Screen[] = [
     //     key: "drinks",
     //     title: "Drinks",
     //     subtitle: "Choose your character",
-    //     price: "149 kr",
     //     durationSeconds: 14,
     //     active: true,
     // },
@@ -418,7 +442,6 @@ export const sampleScreens: Screen[] = [
     //     key: "basics",
     //     title: "The Basics",
     //     subtitle: "Beer · Cider · Wine · Soda",
-    //     price: "79 kr",
     //     durationSeconds: 14,
     //     active: true,
     // },

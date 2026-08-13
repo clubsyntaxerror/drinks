@@ -30,9 +30,10 @@ export type Recipe = {
 };
 
 // A Recipe with its ingredient ids resolved against the Ingredients tab. This is what
-// components actually render.
+// components actually render. Recipe's `order`/`active` don't carry over — getRecipes() has
+// already sorted and filtered by them before composeRecipes() runs, so nothing downstream
+// needs them again.
 export type Item = {
-    order: number;
     category: string;
     name: string;
     emblem: string | undefined;
@@ -40,7 +41,6 @@ export type Item = {
     flavors: Ingredient[]; // every non-spirit ingredient (fruit, mixer, garnish, or a Basics beverage)
     accentColor: string;
     tag: string | undefined;
-    active: boolean;
     outOfStock: boolean; // true if any composing ingredient is marked out of stock
     price: number | undefined;
 };
@@ -58,7 +58,6 @@ export type Screen = {
     key: string; // matches Item.category
     title: string;
     subtitle: string | undefined;
-    price: string | undefined; // one price for everything on this screen, e.g. "139 kr" — not per-drink
     durationSeconds: number;
     active: boolean;
 };
@@ -90,7 +89,6 @@ export function composeRecipes(recipes: Recipe[], ingredients: Ingredient[]): It
         const flavors = resolved.filter((ingredient) => ingredient.kind !== "spirit");
 
         return {
-            order: recipe.order,
             category: recipe.category,
             name: recipe.name,
             emblem: recipe.emblem,
@@ -98,7 +96,6 @@ export function composeRecipes(recipes: Recipe[], ingredients: Ingredient[]): It
             flavors,
             accentColor: flavors[0]?.color ?? spirits[0]?.color ?? "#e0a83e",
             tag: recipe.tag,
-            active: recipe.active,
             outOfStock: resolved.some((ingredient) => !ingredient.inStock),
             price: recipe.price,
         } satisfies Item;
@@ -192,9 +189,8 @@ export const getScreens = cache(async (): Promise<Screen[]> => {
                         key: (row[1] ?? "").trim(),
                         title: row[2] ?? "",
                         subtitle: row[3] || undefined,
-                        price: row[4] || undefined,
-                        durationSeconds: Number(row[5]) || 14,
-                        active: isTruthy(row[6]),
+                        durationSeconds: Number(row[4]) || 14,
+                        active: isTruthy(row[5]),
                     }) satisfies Screen,
             )
             .filter((screen) => screen.active && screen.key)
@@ -209,7 +205,6 @@ export type MenuData = {
     items: Item[];
     messages: Message[];
     screens: Screen[];
-    isSampleData: boolean;
 };
 
 // Aggregates every tab for a route in one call. Falls back to bundled sample content when the
@@ -228,9 +223,8 @@ export const getMenuData = cache(async (): Promise<MenuData> => {
             items: composeRecipes(sampleRecipes, sampleIngredients),
             messages: sampleMessages,
             screens: sampleScreens,
-            isSampleData: true,
         };
     }
 
-    return { items: composeRecipes(recipes, ingredients), messages, screens, isSampleData: false };
+    return { items: composeRecipes(recipes, ingredients), messages, screens };
 });
