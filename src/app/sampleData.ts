@@ -274,7 +274,7 @@ export const sampleRecipes: Recipe[] = [
         order: 12,
         category: "drinks",
         name: "Zelda's Royal Bloom",
-        emblem: "🗡",
+        emblem: "🗡️",
         ingredientIds: ["pear", "grape", "elderflower", "gin"],
         active: true,
         price: 169,
@@ -397,7 +397,7 @@ export const sampleMessages: Message[] = [
 
 export const sampleScreens: Screen[] = [
     {
-        order: 1,
+        order: 2,
         key: "elixirs",
         title: "Elixirs",
         subtitle: "Choose your potion",
@@ -406,7 +406,7 @@ export const sampleScreens: Screen[] = [
         template: "elixirs",
     },
     {
-        order: 2,
+        order: 1,
         key: "drinks",
         title: "Drinks",
         subtitle: "Choose your character",

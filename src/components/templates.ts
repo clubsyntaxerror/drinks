@@ -27,12 +27,10 @@ const TEMPLATES: Record<TemplateKey, TemplateDefinition> = {
     },
     drinks: {
         // WIP placeholder — no bespoke frame/character-portrait art yet, so this leans on
-        // plain CSS (RosterGrid's .character-card) and the "arcade" background mood rather
-        // than a photo. Swapping in real art later is a matter of pointing backgroundImage at
-        // a file and giving RosterGrid/CharacterCard real assets — the registry wiring itself
-        // doesn't need to change.
+        // plain CSS (RosterGrid's .character-card) rather than bespoke card art. The
+        // background photo itself is real (public/assets/background-drinks.png).
         Grid: RosterGrid,
-        backgroundImage: undefined,
+        backgroundImage: "/assets/background-drinks.png",
         backgroundTheme: "arcade",
     },
 };
