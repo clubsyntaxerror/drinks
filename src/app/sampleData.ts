@@ -68,7 +68,8 @@ export const sampleIngredients: Ingredient[] = [
     { id: "soda", name: "Soda", kind: "other", icon: undefined, color: "#0ea5e9", inStock: true },
 ];
 
-// No `price` per recipe — pricing is one value per screen (see sampleScreens), not per drink.
+// `price` is optional per recipe and overrides the screen's shared price (see sampleScreens)
+// when a particular drink costs something different, e.g. Poison and Love Potion below.
 // `emblem` is embossed into the potion icon (see PotionIcon) — matches reference/elixirs.jpg's
 // per-potion glyphs (heart, star, skull, etc.) for the Elixirs screen; the Drinks screen's
 // glyphs come from the character each cocktail is themed after.
@@ -81,6 +82,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["vodka", "pomegranate"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 2,
@@ -90,6 +92,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["vodka", "blue-raspberry"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 3,
@@ -99,6 +102,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["gin", "kiwi", "green-apple"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 4,
@@ -108,6 +112,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["vodka", "grape", "blackberry"],
         tag: undefined,
         active: true,
+        price: 119,
     },
     {
         order: 5,
@@ -117,6 +122,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["gin", "lemon", "yuzu"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 6,
@@ -126,6 +132,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["tequila", "mango", "chili"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 7,
@@ -135,6 +142,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["white-rum", "mint", "coconut"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 8,
@@ -144,6 +152,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["vodka", "licorice", "raspberry"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 9,
@@ -153,6 +162,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["vodka", "strawberry", "cotton-candy"],
         tag: "new",
         active: true,
+        price: 149,
     },
     {
         order: 10,
@@ -162,6 +172,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["gin", "pear", "grape"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 1,
@@ -171,6 +182,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["peach", "vanilla", "vodka", "prosecco"],
         tag: undefined,
         active: true,
+        price: 149,
     },
     {
         order: 2,
@@ -180,6 +192,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["mango", "coconut", "vanilla", "lime", "white-rum"],
         tag: undefined,
         active: true,
+        price: 149,
     },
     {
         order: 3,
@@ -189,6 +202,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["strawberry", "cherry", "vodka"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 4,
@@ -198,6 +212,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["lime", "green-apple", "mint", "gin"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 5,
@@ -207,6 +222,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["cherry", "cinnamon", "chili", "bourbon"],
         tag: undefined,
         active: true,
+        price: 159,
     },
     {
         order: 6,
@@ -216,6 +232,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["honeydew", "kiwi", "vodka"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 7,
@@ -225,6 +242,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["strawberry", "marshmallow", "vodka"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 8,
@@ -234,6 +252,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["blue-raspberry", "lemon", "vodka"],
         tag: undefined,
         active: true,
+        price: 139,
     },
     {
         order: 9,
@@ -243,6 +262,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["passion-fruit", "lemon", "pineapple", "white-rum"],
         tag: undefined,
         active: true,
+        price: 149,
     },
     {
         order: 10,
@@ -252,6 +272,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["earl-grey", "honey", "vanilla", "bourbon"],
         tag: undefined,
         active: true,
+        price: 159,
     },
     {
         order: 11,
@@ -261,6 +282,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["chocolate", "hazelnut", "vanilla", "kahlua", "vodka"],
         tag: undefined,
         active: true,
+        price: 159,
     },
     {
         order: 12,
@@ -270,6 +292,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["pear", "grape", "elderflower", "gin"],
         tag: undefined,
         active: true,
+        price: 169,
     },
     {
         order: 13,
@@ -279,6 +302,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["apple", "mango", "passion-fruit", "white-rum"],
         tag: undefined,
         active: true,
+        price: 149,
     },
     {
         order: 14,
@@ -288,6 +312,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["banana", "toffee", "dark-rum"],
         tag: undefined,
         active: true,
+        price: 149,
     },
     {
         order: 15,
@@ -297,6 +322,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["lemon", "green-apple", "ginger", "gin"],
         tag: undefined,
         active: true,
+        price: 159,
     },
     {
         order: 16,
@@ -306,6 +332,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["cherry", "blackberry", "vanilla", "red-wine", "dark-rum"],
         tag: undefined,
         active: true,
+        price: 179,
     },
     {
         order: 17,
@@ -315,6 +342,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["coffee", "chocolate", "hazelnut", "kahlua", "vodka"],
         tag: undefined,
         active: true,
+        price: 159,
     },
     {
         order: 1,
@@ -324,8 +352,9 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["lager"],
         tag: undefined,
         active: true,
+        price: 79,
     },
-    { order: 2, category: "basics", name: "IPA", emblem: "🍺", ingredientIds: ["ipa"], tag: undefined, active: true },
+    { order: 2, category: "basics", name: "IPA", emblem: "🍺", ingredientIds: ["ipa"], tag: undefined, active: true, price: 89 },
     {
         order: 3,
         category: "basics",
@@ -334,6 +363,7 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["cider"],
         tag: undefined,
         active: true,
+        price: 79,
     },
     {
         order: 4,
@@ -343,8 +373,9 @@ export const sampleRecipes: Recipe[] = [
         ingredientIds: ["prosecco"],
         tag: undefined,
         active: true,
+        price: 99,
     },
-    { order: 5, category: "basics", name: "Soda", emblem: "🥤", ingredientIds: ["soda"], tag: undefined, active: true },
+    { order: 5, category: "basics", name: "Soda", emblem: "🥤", ingredientIds: ["soda"], tag: undefined, active: true, price: 49 },
 ];
 
 export const sampleMessages: Message[] = [

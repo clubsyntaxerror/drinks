@@ -136,7 +136,8 @@ h3 {
 /* Screen header */
 .screen-header {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
 }
 
 .screen-title {
@@ -160,6 +161,9 @@ h3 {
 }
 
 .screen-subtitle-diamond {
+    display: inline-block;
+    position: relative;
+    top: 0.08em;
     color: #a855f7;
 }
 
@@ -369,7 +373,8 @@ h3 {
 .potion-card.out-of-stock .potion-icon,
 .potion-card.out-of-stock .potion-name,
 .potion-card.out-of-stock .potion-flavor,
-.potion-card.out-of-stock .potion-base {
+.potion-card.out-of-stock .potion-base,
+.potion-card.out-of-stock .potion-price {
     filter: grayscale(1) brightness(0.45);
 }
 
@@ -391,11 +396,21 @@ h3 {
 
 .potion-index {
     position: absolute;
-    top: 0.4rem;
-    left: 0.7rem;
+    top: 0.6rem;
+    left: 1.4rem;
     font-family: var(--font-bitpotion);
     font-size: 2.3rem;
     color: #8d8477;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.potion-price {
+    position: absolute;
+    top: 0.6rem;
+    right: 1.4rem;
+    font-family: var(--font-bitpotion);
+    font-size: 2.3rem;
+    color: var(--gold);
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
 }
 
@@ -586,15 +601,15 @@ h3 {
 .scrollbox {
     border: 5px solid #4c2f7a;
     background: rgba(10, 8, 6, 0.6);
-    padding: 0.75rem 1.25rem;
-    margin-top: 1.5rem;
+    padding: 0.421875rem 1.25rem;
+    margin-top: 0.84375rem;
     min-height: 5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     font-family: var(--font-bitpotion);
-    font-size: clamp(2rem, 4vw, 2.6rem);
+    font-size: clamp(2.5rem, 5vw, 3.25rem);
     color: #d8cff0;
     letter-spacing: 0.05em;
 }

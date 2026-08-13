@@ -26,6 +26,7 @@ export type Recipe = {
     ingredientIds: string[];
     tag: string | undefined;
     active: boolean;
+    price: number | undefined; // overrides the screen's shared price for this one drink, e.g. 139
 };
 
 // A Recipe with its ingredient ids resolved against the Ingredients tab. This is what
@@ -41,6 +42,7 @@ export type Item = {
     tag: string | undefined;
     active: boolean;
     outOfStock: boolean; // true if any composing ingredient is marked out of stock
+    price: number | undefined;
 };
 
 export type Message = {
@@ -96,6 +98,7 @@ export function composeRecipes(recipes: Recipe[], ingredients: Ingredient[]): It
             tag: recipe.tag,
             active: recipe.active,
             outOfStock: resolved.some((ingredient) => !ingredient.inStock),
+            price: recipe.price,
         } satisfies Item;
     });
 }
@@ -141,6 +144,7 @@ export const getRecipes = cache(async (): Promise<Recipe[]> => {
                             .filter(Boolean),
                         tag: row[5] || undefined,
                         active: isTruthy(row[6]),
+                        price: row[7] ? Number(row[7]) || undefined : undefined,
                     }) satisfies Recipe,
             )
             .filter((recipe) => recipe.active && recipe.name)
