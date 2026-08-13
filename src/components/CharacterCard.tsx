@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { IngredientGlyph, OutOfStockCross } from "./icons";
+import { IngredientGlyph, OutOfStockCross, TintedGlyph } from "./icons";
 import { withMinLightness } from "./utils/color";
 import type { Item } from "../app/drinksData";
 
@@ -21,7 +21,7 @@ export default function CharacterCard({ item, index }: { item: Item; index: numb
             <span className="character-index">{String(index + 1).padStart(2, "0")}</span>
             {item.price !== undefined && <span className="character-price">{item.price}:-</span>}
             <div className="character-portrait" aria-hidden="true">
-                {item.emblem ?? "❔"}
+                <TintedGlyph glyph={item.emblem ?? "❔"} color={item.accentColor} className="character-portrait-icon" />
             </div>
             <div className="character-info">
                 <h3 className="character-name">{item.name}</h3>

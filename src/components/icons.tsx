@@ -127,6 +127,69 @@ export function OutOfStockCross({ className }: { className?: string }) {
     );
 }
 
+const PORTRAIT_GLYPH_X = 64;
+const PORTRAIT_GLYPH_Y = 64;
+const PORTRAIT_GLYPH_FONT_SIZE = 96;
+
+// Same mosaic color-tint trick as PotionArt's emblem above (mix-blend-mode: color + a small
+// tiled pattern instead of a flat fill, clipped to the glyph's own silhouette via SVG text-as-
+// clipPath), but standalone — the Drinks "character select" cards have no bottle/bulb asset to
+// mask against, so this tints the whole portrait glyph directly rather than an emblem sitting
+// inside one.
+export function TintedGlyph({
+    glyph,
+    color = "#e0a83e",
+    className,
+}: {
+    glyph: string;
+    color?: string;
+    className?: string;
+}) {
+    const clipId = useId();
+    const mosaicId = useId();
+
+    return (
+        <svg viewBox="0 0 128 128" className={className} aria-hidden="true">
+            <defs>
+                <clipPath id={clipId}>
+                    <text
+                        x={PORTRAIT_GLYPH_X}
+                        y={PORTRAIT_GLYPH_Y}
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fontSize={PORTRAIT_GLYPH_FONT_SIZE}
+                    >
+                        {glyph}
+                    </text>
+                </clipPath>
+                <pattern id={mosaicId} width="4" height="4" patternUnits="userSpaceOnUse">
+                    <rect x="0" y="0" width="3.4" height="3.4" fill={color} />
+                </pattern>
+            </defs>
+            <text
+                x={PORTRAIT_GLYPH_X}
+                y={PORTRAIT_GLYPH_Y}
+                textAnchor="middle"
+                dominantBaseline="central"
+                fontSize={PORTRAIT_GLYPH_FONT_SIZE}
+                opacity="0.9"
+                style={{ WebkitTextStroke: "2px #1a1206" }}
+            >
+                {glyph}
+            </text>
+            <rect
+                x="0"
+                y="0"
+                width="128"
+                height="128"
+                fill={`url(#${mosaicId})`}
+                clipPath={`url(#${clipId})`}
+                className="character-portrait-tint"
+            />
+        </svg>
+    );
+}
+
 const INGREDIENT_GLYPHS: Record<string, string> = {
     vodka: "🍾",
     gin: "🌿",

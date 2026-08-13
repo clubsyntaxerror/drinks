@@ -39,14 +39,20 @@ function useActiveMessages(messages: Message[]): string[] {
 export default function Scrollbox({ messages }: { messages: Message[] }) {
     const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
     const activeMessages = useActiveMessages(messages);
+    // Both StaticMessages' local index state and (worse) Textra's internal textArrIndex ref
+    // are never reset or clamped when `data` shrinks (e.g. a message's toTime passes and it
+    // drops out) — Textra's ref just keeps incrementing past the new, shorter array forever,
+    // rendering blank until something remounts it (previously only a full page reload). Keying
+    // on the active set itself forces that remount ourselves the moment the set changes.
+    const activeKey = activeMessages.join("|");
 
     return (
         <div className="scrollbox">
             {activeMessages.length > 0 &&
                 (prefersReducedMotion !== false ? (
-                    <StaticMessages messages={activeMessages} />
+                    <StaticMessages key={activeKey} messages={activeMessages} />
                 ) : (
-                    <Textra effect="simple" data={activeMessages} />
+                    <Textra key={activeKey} effect="simple" data={activeMessages} />
                 ))}
         </div>
     );

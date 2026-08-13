@@ -59,8 +59,11 @@ export default function ScreenCarousel({
         // jump back to message 1 just because the screen behind it changed. Only the screen's
         // own content (and its background, which *should* change per screen) remounts.
         <div className="tv-stage">
-            <Background key={active.key} image={template.backgroundImage} theme={template.backgroundTheme} />
-            <div className={`tv-stage-screen${prefersReducedMotion ? "" : " tv-stage-animated"}`} key={active.key}>
+            <Background key={`bg-${active.key}`} image={template.backgroundImage} theme={template.backgroundTheme} />
+            <div
+                className={`tv-stage-screen${prefersReducedMotion ? "" : " tv-stage-animated"}`}
+                key={`screen-${active.key}`}
+            >
                 <MenuScreen screen={active} items={activeItems} fitToViewport />
             </div>
             <Scrollbox messages={messages} />
