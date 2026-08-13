@@ -224,7 +224,16 @@ h3 {
     border-image-outset: 0;
     border-image-repeat: stretch;
     image-rendering: pixelated;
-    background: rgba(10, 8, 6, 0.92);
+    /* Same checkerboard-mosaic trick as the emblem tint (repeating-conic-gradient tiled small)
+       instead of a flat fill, plus a torch-orange glow (same rgba(255,150,60,...) as .torch)
+       positioned upper-left to match the light-source convention used everywhere else on the
+       card (the frame's rim-lit outline, the emblem's/gloss's own upper-left highlight) — reads
+       as the torchlight actually reaching into the card rather than every card being one flat,
+       uniformly dark rectangle. */
+    background:
+        radial-gradient(circle at 28% 18%, rgba(255, 150, 60, 0.16) 0%, transparent 60%),
+        repeating-conic-gradient(rgba(255, 255, 255, 0.04) 0% 25%, transparent 0% 50%) 0 0 / 6px 6px,
+        rgba(10, 8, 6, 0.92);
     padding: 1.25rem 0.9rem 0.85rem;
     text-align: center;
     box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.55);
@@ -278,6 +287,70 @@ h3 {
     .potion-card {
         animation: none;
     }
+}
+
+/* Tints frame.png's neutral gray/silver border warm gold, with an animated specular glint
+   sweeping across it, instead of leaving the frame a flat uncolored bitmap. mask-image reuses
+   frame.png itself as the mask source — its alpha channel *is* the border ring (transparent in
+   the middle), so this overlay lands exactly on the border art with no separate mask asset
+   needed. mix-blend-mode: overlay colorizes the same way as the potion tint (§ .potion-art-tint):
+   the frame's own dark linework stays dark, its lighter linework picks up the gold wash, and the
+   moving bright band reads as a highlight glinting across polished metal. Two background layers,
+   so only the first (the glint) needs its position animated — the second (the gold wash) stays
+   put, hence two comma-separated values in every keyframe/position below. */
+.potion-card-frame-shine {
+    position: absolute;
+    /* inset: 0 on an absolutely-positioned element resolves against the containing block's
+       *padding* edge, not its border edge — so this landed inside the card's content area,
+       missing the border where frame.png actually renders. These negative insets (matching
+       .potion-card's own border-width exactly) expand it back out to the full border-box. */
+    top: -12px;
+    right: -11px;
+    bottom: -16px;
+    left: -10px;
+    pointer-events: none;
+    -webkit-mask-image: url("/assets/frame.png");
+    mask-image: url("/assets/frame.png");
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    mix-blend-mode: overlay;
+    background:
+        linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.95) 48%, transparent 66%),
+        rgba(224, 168, 62, 0.45);
+    background-size:
+        320% 320%,
+        100% 100%;
+    background-repeat: no-repeat;
+    animation: frame-shine-sweep 4.5s ease-in-out infinite;
+}
+
+@keyframes frame-shine-sweep {
+    0%,
+    100% {
+        background-position:
+            -80% -80%,
+            0 0;
+    }
+    50% {
+        background-position:
+            180% 180%,
+            0 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .potion-card-frame-shine {
+        animation: none;
+        background-position:
+            50% 50%,
+            0 0;
+    }
+}
+
+.potion-card.out-of-stock .potion-card-frame-shine {
+    display: none;
 }
 
 .potion-icon-wrap {

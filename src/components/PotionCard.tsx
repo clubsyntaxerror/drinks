@@ -18,6 +18,9 @@ export default function PotionCard({ item, index }: { item: Item; index: number 
                 } as CSSProperties
             }
         >
+            {/* Tints the (otherwise neutral-gray) frame.png border warm gold, with an animated
+                specular glint sweeping across it — see globals.css for how the mask/blend work. */}
+            <span aria-hidden="true" className="potion-card-frame-shine" />
             <span className="potion-index">{String(index + 1).padStart(2, "0")}</span>
             <div className="potion-icon-wrap">
                 <PotionArt color={item.accentColor} emblem={item.emblem} className="potion-icon" />
