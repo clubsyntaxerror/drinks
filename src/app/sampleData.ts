@@ -348,9 +348,8 @@ export const sampleRecipes: Recipe[] = [
 ];
 
 export const sampleMessages: Message[] = [
-    { order: 1, text: "New arcade cabinet now live upstairs!", active: true },
-    { order: 2, text: "Happy hour 18:00–20:00 — 20% off all Elixirs", active: true },
-    { order: 3, text: "Ask your bartender about tonight's secret menu item", active: true },
+    { order: 1, text: "HAPPY HOUR BEER / CIDER / WINE / SPARKLING / SODA TO 23:00!", active: true },
+    { order: 3, text: "DON'T FORGET TO PARTICIPATE IN THE QUIZ WALK!", active: true },
 ];
 
 export const sampleScreens: Screen[] = [

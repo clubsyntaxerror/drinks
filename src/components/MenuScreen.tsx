@@ -15,7 +15,7 @@ export default function MenuScreen({
 }) {
     return (
         <section className="menu-screen">
-            <ScreenHeader title={screen.title} subtitle={screen.subtitle} price={screen.price} />
+            <ScreenHeader title={screen.title} subtitle={screen.subtitle} />
             <MenuGrid items={items} fitToViewport={fitToViewport} />
         </section>
     );

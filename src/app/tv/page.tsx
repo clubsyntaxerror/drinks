@@ -7,7 +7,7 @@ import Background from "../../components/Background";
 // ?screen=<index> or ?paused=1 (see ScreenCarousel). Suspense is required here because
 // ScreenCarousel reads useSearchParams(), which Next.js requires to be wrapped.
 export default async function TvPage() {
-    const { items, messages, screens, isSampleData } = await getMenuData();
+    const { items, messages, screens } = await getMenuData();
 
     return (
         <>
@@ -15,7 +15,6 @@ export default async function TvPage() {
             <Suspense fallback={null}>
                 <ScreenCarousel screens={screens} items={items} messages={messages} />
             </Suspense>
-            {isSampleData && <p className="sample-data-badge">Sample data — connect the Google Sheet</p>}
         </>
     );
 }

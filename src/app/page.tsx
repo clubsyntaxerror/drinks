@@ -6,14 +6,13 @@ import Background from "../components/Background";
 // Mobile/generic route: every screen stacked in order, page scrolls normally. See /tv for the
 // no-scroll, auto-cycling kiosk version — both share MenuScreen/MenuGrid/PotionCard.
 export default async function HomePage() {
-    const { items, messages, screens, isSampleData } = await getMenuData();
+    const { items, messages, screens } = await getMenuData();
 
     return (
         <>
             <Background />
             <main className="mobile-menu">
                 <div className="mobile-hero">
-                    <p className="screen-eyebrow">Syntax Error</p>
                     <h1 className="mobile-title">Menu</h1>
                 </div>
                 {screens.map((screen) => (
@@ -25,7 +24,6 @@ export default async function HomePage() {
                 ))}
                 <Scrollbox messages={messages.map((message) => message.text)} />
             </main>
-            {isSampleData && <p className="sample-data-badge">Sample data — connect the Google Sheet</p>}
         </>
     );
 }

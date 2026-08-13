@@ -32,6 +32,12 @@ export function PotionArt({
     return (
         <span className={className}>
             <img src={POTION_ART_SRC} alt="" aria-hidden="true" className="potion-art-base" />
+            {/* Pre-darkens the fill area before the tint blends against it — see the long
+                comment on .potion-art-fill-shade in globals.css for why: overlay's "maximum
+                tint" only happens near 50% gray, and the bulb's flat interior sits at ~93%
+                white, so without this the tint stayed washed out no matter how saturated the
+                accent color was. */}
+            <span aria-hidden="true" className="potion-art-fill-shade" />
             <span aria-hidden="true" className="potion-art-tint" style={{ backgroundColor: color }} />
             {emblem && (
                 // A small SVG just for the emblem (not plain HTML text) so it scales fluidly
@@ -61,9 +67,12 @@ export function PotionArt({
                             color overlay itself reads as a chunky pixel/mosaic tint rather than
                             smooth vector color — matching the rest of the site's pixel-art look
                             instead of looking anti-aliased next to it. patternUnits is in the
-                            same 128x128 user-space as everything else here. */}
+                            same 128x128 user-space as everything else here. Squares cover 3.4 of
+                            each 4-unit tile (85%, thin gaps) rather than half-and-half, so more
+                            of the glyph actually gets the color blend and less shows through
+                            untinted — reads as a stronger, more saturated tint overall. */}
                         <pattern id={emblemMosaicId} width="4" height="4" patternUnits="userSpaceOnUse">
-                            <rect x="0" y="0" width="2.6" height="2.6" fill={color} />
+                            <rect x="0" y="0" width="3.4" height="3.4" fill={color} />
                         </pattern>
                     </defs>
                     <text
