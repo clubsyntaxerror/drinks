@@ -24,7 +24,6 @@ export type Recipe = {
     name: string;
     emblem: string | undefined; // an emoji embossed into the potion icon, e.g. "❤️" for Health Potion
     ingredientIds: string[];
-    tag: string | undefined;
     active: boolean;
     price: number | undefined; // overrides the screen's shared price for this one drink, e.g. 139
 };
@@ -40,7 +39,6 @@ export type Item = {
     spirits: Ingredient[];
     flavors: Ingredient[]; // every non-spirit ingredient (fruit, mixer, garnish, or a Basics beverage)
     accentColor: string;
-    tag: string | undefined;
     outOfStock: boolean; // true if any composing ingredient is marked out of stock
     price: number | undefined;
 };
@@ -95,7 +93,6 @@ export function composeRecipes(recipes: Recipe[], ingredients: Ingredient[]): It
             spirits,
             flavors,
             accentColor: flavors[0]?.color ?? spirits[0]?.color ?? "#e0a83e",
-            tag: recipe.tag,
             outOfStock: resolved.some((ingredient) => !ingredient.inStock),
             price: recipe.price,
         } satisfies Item;
@@ -141,9 +138,8 @@ export const getRecipes = cache(async (): Promise<Recipe[]> => {
                             .split(",")
                             .map((id) => id.trim())
                             .filter(Boolean),
-                        tag: row[5] || undefined,
-                        active: isTruthy(row[6]),
-                        price: row[7] ? Number(row[7]) || undefined : undefined,
+                        active: isTruthy(row[5]),
+                        price: row[6] ? Number(row[6]) || undefined : undefined,
                     }) satisfies Recipe,
             )
             .filter((recipe) => recipe.active && recipe.name)

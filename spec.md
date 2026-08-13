@@ -90,7 +90,6 @@ order              number   — sort order within its category
 category           string   — free text, e.g. "elixirs", "drinks", "basics" — NOT a hardcoded enum, so staff can add screens/categories without a code change
 name                 string
 ingredientIds     string[] — comma-separated ids into the Ingredient inventory (one or more spirits, one or more other ingredients)
-tag                  string?  — e.g. "new", "seasonal"
 active               boolean  — hide without deleting the row
 price                number?  — this item's price, e.g. 139; shown on its card as "139:-". Optional — blank just omits it
 ```

@@ -29,7 +29,15 @@ export default function PotionCard({ item, index }: { item: Item; index: number 
             <div className="potion-body">
                 <h3 className="potion-name">{item.name}</h3>
                 {item.flavors.length > 0 && (
-                    <p className="potion-flavor">{item.flavors.map((flavor) => flavor.name).join(" & ")}</p>
+                    <p className="potion-flavor">
+                        {item.flavors.map((flavor, i) => (
+                            <span key={flavor.id}>
+                                {i > 0 && " & "}
+                                <IngredientGlyph ingredient={flavor} />
+                                {flavor.name}
+                            </span>
+                        ))}
+                    </p>
                 )}
                 {item.spirits.length > 0 && (
                     <p className="potion-base">
