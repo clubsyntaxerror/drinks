@@ -168,7 +168,7 @@ export const sampleRecipes: Recipe[] = [
 export const sampleMessages: Message[] = [
     {
         order: 1,
-        text: "HAPPY HOUR: BEER, CIDER, WINE, SPARKLING & SODA UNTIL 23:00!",
+        text: "HAPPY HOUR FOR BEER, CIDER, WINE, SPARKLING & SODA UNTIL 23:00!",
         active: true,
         fromTime: undefined,
         toTime: "23:00",

@@ -11,9 +11,6 @@ export default async function HomePage() {
 
     return (
         <main className="mobile-menu">
-            <div className="mobile-hero">
-                <h1 className="mobile-title">Menu</h1>
-            </div>
             {screens.map((screen) => (
                 <MenuScreen
                     key={screen.key}

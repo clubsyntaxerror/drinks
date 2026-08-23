@@ -14,8 +14,13 @@ const GRID_GAP_PX = 16; // 1rem
 const MIN_ROWS = 2;
 
 // `fitToViewport` is only turned on by the TV route: it scales the grid down (never up) so
-// it always fits the screen without scrolling, whatever the item count. The mobile route
-// leaves it off and just lets the grid wrap/scroll normally.
+// it always fits the screen without scrolling, whatever the item count, using useBalancedColumns
+// to pick a column count that fills whole rows evenly against the TV stage's own width. The
+// mobile route leaves it off and just lets the grid wrap/scroll normally — its column count
+// instead comes from plain CSS breakpoints on .menu-grid (globals.css), which suit a scrolling
+// page much better than the TV route's row-balancing math: there's no fixed viewport to fit
+// exactly, just "how many columns look right at this width," and a JS-computed column count
+// was landing on visually inconsistent results across nearby phone widths.
 export default function MenuGrid({ items, fitToViewport = false }: { items: Item[]; fitToViewport?: boolean }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -32,10 +37,13 @@ export default function MenuGrid({ items, fitToViewport = false }: { items: Item
                 ref={contentRef}
                 className="menu-grid"
                 style={
-                    {
-                        gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-                        ...(fitToViewport ? { transform: `scale(${scale})`, transformOrigin: "top center" } : {}),
-                    } as CSSProperties
+                    fitToViewport
+                        ? ({
+                              gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                              transform: `scale(${scale})`,
+                              transformOrigin: "top center",
+                          } as CSSProperties)
+                        : undefined
                 }
             >
                 {items.map((item, index) => (
