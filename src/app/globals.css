@@ -41,10 +41,13 @@ body {
 /* Background: an optional photo, a translucent vignette tint on top of it, and (dungeon theme
    only) two blurred, flickering "torch" glows above that. Cheap on purpose (opacity/transform
    only, no video) so it holds up on weak TV browsers.
-   Fixed by default (the TV route: .tv-stage already fills the viewport, so a plain viewport-
-   fixed layer is simplest and ignores .tv-stage's own padding entirely). .menu-background-
-   scoped switches to absolute for the mobile route, where each stacked screen section needs
-   its own background instead of one global layer — see .menu-screen's position: relative. */
+   Fixed by default: a plain viewport-fixed layer, for anywhere a screen's box always fills the
+   true browser viewport 1:1. .menu-background-scoped switches to absolute instead, anchored to
+   the nearest positioned ancestor — both the mobile route (each stacked screen section needs
+   its own background, not one global layer — see .menu-screen's position: relative) and the TV
+   route (.tv-stage is a fixed-aspect-ratio box that can be narrower/wider than the real
+   viewport and scrolls independently of it — see .tv-viewport — so a `fixed` layer would drift
+   out of alignment with it instead of scrolling along). */
 .menu-background {
     position: fixed;
     inset: 0;
@@ -172,6 +175,11 @@ body {
 
 .screen-title {
     font-family: var(--font-lamano);
+    /* Both bespoke fonts (layout.tsx) ship a single weight, no real bold face — h1/h2/h3's
+       UA-stylesheet default bold forces the browser to synthesize one instead, which fattens
+       these pixel-art glyphs off their grid into a blurry mess. Reset on every heading using
+       either font (.screen-title/.mobile-title here; .potion-name/.character-name below). */
+    font-weight: normal;
     font-size: clamp(1.6rem, 5.5vw, 3.4rem);
     line-height: 1.3;
     color: var(--gold);
@@ -377,7 +385,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 0.6rem;
+    margin-top: 1.5rem;
 }
 
 .potion-body {
@@ -441,13 +449,17 @@ body {
    border-box, so a card of width W renders the frame at scale W/192. For potion.png (128x128)
    to render at that *same* scale — rather than an arbitrary fraction of the card picked by eye
    — it needs width = (128/192) of that same reference width, with height following via
-   aspect-ratio. The old approach sized this off 50% of the flex content *height* instead, which
-   is smaller than the card's true width-based scale once the card's own border+padding are
-   subtracted out — that's why the potion looked undersized relative to the frame. */
+   aspect-ratio.
+   `100%` here resolves against .potion-icon-wrap's content box, which — since nothing between
+   it and .potion-card adds its own padding — is .potion-card's own content box: its border-box
+   width W minus the card's 1.7rem-per-side horizontal padding. Left as a bare `calc(100% *
+   128/192)`, that undershoots the intended W-based scale by that padding's share (128/192 of
+   3.4rem), which is exactly why the potion rendered at ~2/5 of the card's height instead of the
+   intended half: adding the padding back before applying the ratio reconstructs W first. */
 .potion-icon {
     position: relative;
     display: block;
-    width: calc(100% * 128 / 192);
+    width: calc((100% + 3.4rem) * 128 / 192);
     height: auto;
     aspect-ratio: 1 / 1; /* potion.png is 128x128 */
 }
@@ -582,6 +594,7 @@ body {
        edge — the TV route doesn't need the vw term since its cards are already scaled as a
        whole by useFitToViewport, and 5.5vw exceeds the 4.95rem cap at any TV-sized viewport
        anyway, so this renders identically to a flat 4.95rem there. */
+    font-weight: normal;
     font-size: clamp(1.6rem, 5.5vw, 4.95rem);
     line-height: 0.7;
     /* No min-height reservation for a second line on purpose: it kept flavor/spirit rows
@@ -604,7 +617,7 @@ body {
     font-size: clamp(0.9rem, 2.6vw, 2.35rem);
     line-height: 0.7;
     color: #cfc7b8;
-    margin-top: 0.15rem;
+    margin: 0.15rem 0.4rem 0;
 }
 
 .potion-base {
@@ -619,6 +632,7 @@ body {
        available space above them in a flex column. */
     margin-top: auto;
     padding-top: 0.4rem;
+    margin-bottom: 0.3rem;
 }
 
 .ingredient-glyph {
@@ -788,6 +802,7 @@ body {
    otherwise stretch every card in that row to match. */
 .character-name {
     font-family: var(--font-bitpotion);
+    font-weight: normal;
     font-size: 3.46875rem;
     line-height: 0.6;
     letter-spacing: 0.02em;
@@ -887,6 +902,7 @@ body {
 
 .mobile-title {
     font-family: var(--font-lamano);
+    font-weight: normal;
     font-size: clamp(2rem, 9vw, 3.2rem);
     color: var(--gold);
     text-shadow: 0 0 16px rgba(224, 168, 62, 0.45);
@@ -905,17 +921,44 @@ body {
     margin-top: 3rem;
 }
 
-/* TV route */
+/* TV route: .tv-viewport is the real browser viewport, whatever shape it actually is. It only
+   ever scrolls horizontally (never vertically — height is pinned to the viewport itself) so
+   .tv-stage, sized off that fixed height alone, can overflow it horizontally on anything
+   narrower-than-16:9 (most phones held upright) without needing to shrink or reflow — the
+   point is to demo the kiosk layout as a real TV would render it without device emulation. */
+.tv-viewport {
+    width: 100dvw;
+    height: 100dvh;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+/* height: 100% (of .tv-viewport, i.e. 100dvh) + aspect-ratio with no explicit width lets the
+   browser derive width purely from that height — exactly "viewport height as the y, base x
+   off it" — instead of the old width: 100vw, which on an actual 16:9 device came out the same
+   but on anything else (e.g. a phone in portrait) squashed the stage into the wrong shape. */
 .tv-stage {
     position: relative;
     z-index: 1;
-    height: 100dvh;
-    width: 100vw;
+    height: 100%;
+    aspect-ratio: 16 / 9;
+    margin-inline: auto;
+    /* 1% of this box's own (height-derived) width, for the handful of rules below that need to
+       scale with .tv-stage itself rather than the real browser viewport — plain `vw` units
+       would resolve against the latter, which is only ever equal to .tv-stage's width on an
+       actual 16:9 device. Since width := height * 16/9 here, 1% of that width is (16/9)% of
+       the height, i.e. of 1dvh. */
+    --tv-vw: calc(16 / 9 * 1dvh);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 3vh 3vw;
+    /* Trimmed from 3vh: the grid's own natural (unscaled) height comfortably exceeds what's
+       available even at 100vh, so useFitToViewport's uniform scale-to-fit is height-bound, not
+       width-bound — every bit of vertical chrome reclaimed here (and from .screen-header/
+       .scrollbox below) raises that scale, which widens every card too since it's the same
+       transform on both axes. */
+    padding: 1.5vh;
     box-sizing: border-box;
     overflow: hidden;
 }
@@ -947,6 +990,70 @@ body {
 .tv-stage .roster-grid-viewport {
     flex: 1;
     min-height: 0;
+}
+
+/* Same reasoning as .tv-stage's own padding trim above: less chrome around the grid leaves
+   useFitToViewport more height to scale the (height-bound) grid up into, which widens every
+   card too. Scoped to .tv-stage rather than edited on the shared base rules, which the mobile
+   route also uses at its own, unrelated scale. */
+.tv-stage .screen-header {
+    margin-top: 0.75rem;
+    margin-bottom: 0.4rem;
+}
+
+.tv-stage .scrollbox {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    margin-top: 0.5rem;
+    min-height: 4rem;
+}
+
+/* Every clamp() below that has a `vw` middle term was tuned back when .tv-stage was always
+   exactly 100vw wide, so `vw` and "% of the stage" were the same thing. Now that .tv-stage can
+   be narrower or wider than the real viewport (see .tv-viewport above), those `vw` terms need
+   to track the stage's own width instead — otherwise resizing the *browser window* (not the
+   stage, which stays a fixed 16:9 box) visibly shrinks/grows this text for no in-universe
+   reason. --tv-vw (defined on .tv-stage) is that same percentage measured against the stage's
+   height-derived width instead of the real viewport, so swapping each `Nvw` for
+   `calc(N * var(--tv-vw))` reproduces the original scaling relative to the right box.
+   The multipliers/caps themselves are also bumped up from the shared base rule (not just
+   ported 1:1) — a bit more legible from across a bar than the mobile-tuned sizes. */
+.tv-stage .screen-title {
+    font-size: clamp(1.6rem, calc(5.5 * var(--tv-vw)), 3.4rem);
+}
+
+.tv-stage .screen-subtitle {
+    font-size: clamp(2rem, calc(4.4 * var(--tv-vw)), 2.8rem);
+}
+
+.tv-stage .potion-name {
+    font-size: clamp(1.6rem, calc(6.3 * var(--tv-vw)), 5.7rem);
+}
+
+.tv-stage .potion-flavor {
+    font-size: clamp(0.9rem, calc(3.45 * var(--tv-vw)), 3.1rem);
+}
+
+.tv-stage .potion-base {
+    font-size: clamp(0.85rem, calc(3.1 * var(--tv-vw)), 2.9rem);
+}
+
+.tv-stage .potion-index,
+.tv-stage .potion-price {
+    top: 3.4rem;
+    font-size: 3.5625rem;
+}
+
+.tv-stage .potion-index {
+    left: 4.2rem;
+}
+
+.tv-stage .potion-price {
+    right: 4.2rem;
+}
+
+.tv-stage .scrollbox {
+    font-size: clamp(2.5rem, calc(5 * var(--tv-vw)), 3.25rem);
 }
 
 .tv-stage-animated {

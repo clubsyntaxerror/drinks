@@ -1,28 +1,18 @@
 // Placeholder content shown when the Google Sheet isn't configured yet (no env vars) or is
 // reachable but empty. Lets `npm run dev` render a real-looking menu before the spreadsheet
 // exists. Swapped out automatically the moment the sheet returns real rows — see getMenuData().
-//
-// "coconut" is deliberately marked out of stock below, so Frost Resistance Potion (and Daisy
-// Sunshine, which shares the ingredient) render crossed-out on first run — a live demo of the
-// inventory cascade, not a mistake.
 import type { Ingredient, Recipe, Message, Screen } from "./drinksData";
 
 export const sampleIngredients: Ingredient[] = [
     // Spirits. `icon` is set explicitly here rather than left to IngredientGlyph's
-    // keyword-fallback guess (see components/icons.tsx) — bourbon, kahlua, and prosecco don't
-    // match any of that fallback's keywords, so they'd otherwise silently render with no glyph.
+    // keyword-fallback guess (see components/icons.tsx) — prosecco doesn't match any of that
+    // fallback's keywords, so it'd otherwise silently render with no glyph.
     { id: "vodka", name: "Vodka", kind: "spirit", icon: "🍾", color: "#cbd5e1", inStock: true },
     { id: "gin", name: "Gin", kind: "spirit", icon: "🌿", color: "#4ade80", inStock: true },
     { id: "tequila", name: "Tequila", kind: "spirit", icon: "🌵", color: "#eab308", inStock: true },
     { id: "white-rum", name: "White Rum", kind: "spirit", icon: "🌴", color: "#38bdf8", inStock: true },
-    { id: "dark-rum", name: "Dark Rum", kind: "spirit", icon: "🌴", color: "#4a2c0f", inStock: true },
-    { id: "bourbon", name: "Bourbon", kind: "spirit", icon: "🥃", color: "#b5651d", inStock: true },
-    { id: "red-wine", name: "Red Wine", kind: "spirit", icon: "🍷", color: "#7f1d1d", inStock: true },
-    { id: "kahlua", name: "Kahlúa", kind: "spirit", icon: "☕", color: "#3b1f0f", inStock: true },
-    // Prosecco doubles as a Basics beverage and a cocktail base — same single ingredient
-    // either way, so it renders in the spirit/glyph row for both (kind is a property of the
-    // ingredient, not the recipe), unlike Lager/IPA/Cider/Soda below which are kind "other"
-    // and render in the flavor row instead.
+    // Prosecco is kind "spirit" (unlike Lager/IPA/Cider/Soda below, which are kind "other") so
+    // it renders in the spirit/glyph row of its Basics recipe rather than the flavor row.
     { id: "prosecco", name: "Prosecco", kind: "spirit", icon: "🥂", color: "#eab308", inStock: true },
 
     // Elixir flavor ingredients
@@ -31,39 +21,15 @@ export const sampleIngredients: Ingredient[] = [
     { id: "kiwi", name: "Kiwi", kind: "other", icon: undefined, color: "#16a34a", inStock: true },
     { id: "green-apple", name: "Green Apple", kind: "other", icon: undefined, color: "#4ade80", inStock: true },
     { id: "grape", name: "Grape", kind: "other", icon: undefined, color: "#9333ea", inStock: true },
-    { id: "blackberry", name: "Blackberry", kind: "other", icon: undefined, color: "#581c87", inStock: true },
     { id: "lemon", name: "Lemon", kind: "other", icon: undefined, color: "#ca8a04", inStock: true },
     { id: "yuzu", name: "Yuzu", kind: "other", icon: undefined, color: "#facc15", inStock: true },
     { id: "mango", name: "Mango", kind: "other", icon: undefined, color: "#ea580c", inStock: true },
     { id: "chili", name: "Chili", kind: "other", icon: undefined, color: "#dc2626", inStock: true },
     { id: "mint", name: "Mint", kind: "other", icon: undefined, color: "#0891b2", inStock: true },
-    { id: "coconut", name: "Coconut", kind: "other", icon: undefined, color: "#f8fafc", inStock: false },
-    { id: "licorice", name: "Licorice", kind: "other", icon: undefined, color: "#2b1640", inStock: true },
-    { id: "raspberry", name: "Raspberry", kind: "other", icon: undefined, color: "#be123c", inStock: true },
+    { id: "coconut", name: "Coconut", kind: "other", icon: undefined, color: "#f8fafc", inStock: true },
     { id: "strawberry", name: "Strawberry", kind: "other", icon: undefined, color: "#db2777", inStock: true },
     { id: "cotton-candy", name: "Cotton Candy", kind: "other", icon: undefined, color: "#f9a8d4", inStock: true },
     { id: "pear", name: "Pear", kind: "other", icon: undefined, color: "#65a30d", inStock: true },
-
-    // Drinks-screen flavor ingredients ("Choose your character")
-    { id: "coffee", name: "Coffee", kind: "other", icon: undefined, color: "#78350f", inStock: true },
-    { id: "vanilla", name: "Vanilla", kind: "other", icon: undefined, color: "#fef3c7", inStock: true },
-    { id: "lime", name: "Lime", kind: "other", icon: undefined, color: "#65a30d", inStock: true },
-    { id: "peach", name: "Peach", kind: "other", icon: undefined, color: "#fda4af", inStock: true },
-    { id: "cherry", name: "Cherry", kind: "other", icon: undefined, color: "#b91c1c", inStock: true },
-    { id: "cinnamon", name: "Cinnamon", kind: "other", icon: undefined, color: "#a3672b", inStock: true },
-    { id: "honeydew", name: "Honeydew Melon", kind: "other", icon: undefined, color: "#bef264", inStock: true },
-    { id: "marshmallow", name: "Marshmallow", kind: "other", icon: undefined, color: "#fbcfe8", inStock: true },
-    { id: "passion-fruit", name: "Passion Fruit", kind: "other", icon: undefined, color: "#f59e0b", inStock: true },
-    { id: "pineapple", name: "Pineapple", kind: "other", icon: undefined, color: "#fde047", inStock: true },
-    { id: "earl-grey", name: "Earl Grey", kind: "other", icon: undefined, color: "#6b4226", inStock: true },
-    { id: "honey", name: "Honey", kind: "other", icon: undefined, color: "#d97706", inStock: true },
-    { id: "chocolate", name: "Chocolate", kind: "other", icon: undefined, color: "#45250f", inStock: true },
-    { id: "hazelnut", name: "Hazelnut", kind: "other", icon: undefined, color: "#8a5a34", inStock: true },
-    { id: "elderflower", name: "Elderflower", kind: "other", icon: undefined, color: "#e9d8fd", inStock: true },
-    { id: "apple", name: "Apple", kind: "other", icon: undefined, color: "#dc2626", inStock: true },
-    { id: "banana", name: "Banana", kind: "other", icon: undefined, color: "#fef08a", inStock: true },
-    { id: "toffee", name: "Toffee", kind: "other", icon: undefined, color: "#92400e", inStock: true },
-    { id: "ginger", name: "Ginger", kind: "other", icon: undefined, color: "#eab308", inStock: true },
 
     // Basics screen — each is its own "ingredient" (a whole beverage, not a recipe). These render
     // in the flavor row (kind "other"), which — unlike the spirit row — didn't render
@@ -76,10 +42,9 @@ export const sampleIngredients: Ingredient[] = [
 ];
 
 // `price` is optional per recipe and overrides the screen's shared price (see sampleScreens)
-// when a particular drink costs something different, e.g. Poison and Love Potion below.
-// `emblem` is embossed into the potion icon (see PotionIcon) — matches reference/elixirs.jpg's
-// per-potion glyphs (heart, star, skull, etc.) for the Elixirs screen; the Drinks screen's
-// glyphs come from the character each cocktail is themed after.
+// when a particular drink costs something different, e.g. Love below (149 vs. the shared 139).
+// `emblem` is embossed into the potion icon (see PotionArt) — matches reference/elixirs.jpg's
+// per-potion glyphs (heart, star, skull, etc.).
 export const sampleRecipes: Recipe[] = [
     {
         order: 1,
@@ -111,15 +76,6 @@ export const sampleRecipes: Recipe[] = [
     {
         order: 4,
         category: "elixirs",
-        name: "Poison",
-        emblem: "💀",
-        ingredientIds: ["vodka", "grape", "blackberry"],
-        active: true,
-        price: 119,
-    },
-    {
-        order: 5,
-        category: "elixirs",
         name: "Speed",
         emblem: "⚡",
         ingredientIds: ["gin", "lemon", "yuzu"],
@@ -127,7 +83,7 @@ export const sampleRecipes: Recipe[] = [
         price: 139,
     },
     {
-        order: 6,
+        order: 5,
         category: "elixirs",
         name: "Fire Resistance",
         emblem: "🔥",
@@ -136,7 +92,7 @@ export const sampleRecipes: Recipe[] = [
         price: 139,
     },
     {
-        order: 7,
+        order: 6,
         category: "elixirs",
         name: "Frost Resistance",
         emblem: "❄️",
@@ -145,16 +101,7 @@ export const sampleRecipes: Recipe[] = [
         price: 139,
     },
     {
-        order: 8,
-        category: "elixirs",
-        name: "Shadow",
-        emblem: "🌙",
-        ingredientIds: ["vodka", "licorice", "raspberry"],
-        active: true,
-        price: 139,
-    },
-    {
-        order: 9,
+        order: 7,
         category: "elixirs",
         name: "Love",
         emblem: "💗",
@@ -163,166 +110,13 @@ export const sampleRecipes: Recipe[] = [
         price: 149,
     },
     {
-        order: 10,
+        order: 8,
         category: "elixirs",
         name: "Luck",
         emblem: "🍀",
         ingredientIds: ["gin", "pear", "grape"],
         active: true,
         price: 139,
-    },
-    {
-        order: 1,
-        category: "drinks",
-        name: "Peach Cocktail",
-        emblem: "👑",
-        ingredientIds: ["peach", "vanilla", "vodka", "prosecco"],
-        active: true,
-        price: 149,
-    },
-    {
-        order: 2,
-        category: "drinks",
-        name: "Daisy Sunshine",
-        emblem: "🌼",
-        ingredientIds: ["mango", "coconut", "vanilla", "lime", "white-rum"],
-        active: true,
-        price: 149,
-    },
-    {
-        order: 3,
-        category: "drinks",
-        name: "Mario Berry Blast",
-        emblem: "🍄",
-        ingredientIds: ["strawberry", "cherry", "vodka"],
-        active: true,
-        price: 139,
-    },
-    {
-        order: 4,
-        category: "drinks",
-        name: "Luigi Lime",
-        emblem: "💚",
-        ingredientIds: ["lime", "green-apple", "mint", "gin"],
-        active: true,
-        price: 139,
-    },
-    {
-        order: 5,
-        category: "drinks",
-        name: "Bowser Inferno",
-        emblem: "🐢",
-        ingredientIds: ["cherry", "cinnamon", "chili", "bourbon"],
-        active: true,
-        price: 159,
-    },
-    {
-        order: 6,
-        category: "drinks",
-        name: "Yoshi Melon",
-        emblem: "🥚",
-        ingredientIds: ["honeydew", "kiwi", "vodka"],
-        active: true,
-        price: 139,
-    },
-    {
-        order: 7,
-        category: "drinks",
-        name: "Kirby Pink Puff",
-        emblem: "⭐",
-        ingredientIds: ["strawberry", "marshmallow", "vodka"],
-        active: true,
-        price: 139,
-    },
-    {
-        order: 8,
-        category: "drinks",
-        name: "Mega Man Blue Burst",
-        emblem: "🤖",
-        ingredientIds: ["blue-raspberry", "lemon", "vodka"],
-        active: true,
-        price: 139,
-    },
-    {
-        order: 9,
-        category: "drinks",
-        name: "Pikachu Thunder",
-        emblem: "⚡",
-        ingredientIds: ["passion-fruit", "lemon", "pineapple", "white-rum"],
-        active: true,
-        price: 149,
-    },
-    {
-        order: 10,
-        category: "drinks",
-        name: "Cuphead Earl Grey",
-        emblem: "☕",
-        ingredientIds: ["earl-grey", "honey", "vanilla", "bourbon"],
-        active: true,
-        price: 159,
-    },
-    {
-        order: 11,
-        category: "drinks",
-        name: "Mugman Cocoa",
-        emblem: "🍫",
-        ingredientIds: ["chocolate", "hazelnut", "vanilla", "kahlua", "vodka"],
-        active: true,
-        price: 159,
-    },
-    {
-        order: 12,
-        category: "drinks",
-        name: "Zelda's Royal Bloom",
-        emblem: "🗡️",
-        ingredientIds: ["pear", "grape", "elderflower", "gin"],
-        active: true,
-        price: 169,
-    },
-    {
-        order: 13,
-        category: "drinks",
-        name: "Crash Wumpa",
-        emblem: "🍎",
-        ingredientIds: ["apple", "mango", "passion-fruit", "white-rum"],
-        active: true,
-        price: 149,
-    },
-    {
-        order: 14,
-        category: "drinks",
-        name: "Donkey Kong Banana Smash",
-        emblem: "🦍",
-        ingredientIds: ["banana", "toffee", "dark-rum"],
-        active: true,
-        price: 149,
-    },
-    {
-        order: 15,
-        category: "drinks",
-        name: "Leon Kennedys Rookie Remedy",
-        emblem: "🦁",
-        ingredientIds: ["lemon", "green-apple", "ginger", "gin"],
-        active: true,
-        price: 159,
-    },
-    {
-        order: 16,
-        category: "drinks",
-        name: "Lady Dimitrescu",
-        emblem: "🧛",
-        ingredientIds: ["cherry", "blackberry", "vanilla", "red-wine", "dark-rum"],
-        active: true,
-        price: 179,
-    },
-    {
-        order: 17,
-        category: "drinks",
-        name: "Gordon Freeman",
-        emblem: "👨‍🔬",
-        ingredientIds: ["coffee", "chocolate", "hazelnut", "kahlua", "vodka"],
-        active: true,
-        price: 159,
     },
     {
         order: 1,
@@ -397,7 +191,7 @@ export const sampleMessages: Message[] = [
 
 export const sampleScreens: Screen[] = [
     {
-        order: 2,
+        order: 1,
         key: "elixirs",
         title: "Elixirs",
         subtitle: "Choose your potion",
@@ -405,17 +199,8 @@ export const sampleScreens: Screen[] = [
         active: true,
         template: "elixirs",
     },
-    {
-        order: 1,
-        key: "drinks",
-        title: "Drinks",
-        subtitle: "Choose your character",
-        durationSeconds: 24,
-        active: true,
-        template: "drinks",
-    },
     // {
-    //     order: 3,
+    //     order: 2,
     //     key: "basics",
     //     title: "The Basics",
     //     subtitle: "Beer · Cider · Wine · Soda",

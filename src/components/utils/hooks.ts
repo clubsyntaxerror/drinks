@@ -67,14 +67,18 @@ export function useFitToViewport(
 // on row 1, leftovers on row 2"), by first finding how many minColumnWidth-wide columns fit in
 // the container, then working out the row count that needs, then dividing items evenly across
 // that many rows. Matches the reference image's rectangular grid instead of CSS auto-fit's
-// greedy packing. Uncapped on purpose: a bigger roster (e.g. Drinks) is meant to spread wider
-// and use more of the screen than a small one (e.g. Elixirs' 10 items -> 5x2), not shrink into
-// more rows at the same column count.
+// greedy packing. Uncapped by default (minRows: 1): a bigger roster (e.g. Drinks) is meant to
+// spread wider and use more of the screen as items are added, not shrink into more rows at the
+// same column count. minRows opts a caller out of that for item counts small enough to fit in
+// fewer rows than intended — Elixirs' 8 items comfortably fit in a single row on a TV-width
+// container, but the screen is designed around a 2-row grid regardless of exact count, so it
+// passes minRows: 2 to keep that shape (8 -> 4x2, same as 10 -> 5x2 before two were removed).
 export function useBalancedColumns(
     containerRef: RefObject<HTMLElement | null>,
     itemCount: number,
     minColumnWidth: number,
     gap: number,
+    minRows: number = 1,
 ) {
     const [columns, setColumns] = useState(() => Math.max(1, Math.min(itemCount, 4)));
 
@@ -91,7 +95,8 @@ export function useBalancedColumns(
             }
 
             const maxColumnsThatFit = Math.max(1, Math.floor((width + gap) / (minColumnWidth + gap)));
-            const columnsToFill = Math.min(maxColumnsThatFit, itemCount);
+            const maxColumnsForMinRows = Math.ceil(itemCount / minRows);
+            const columnsToFill = Math.min(maxColumnsThatFit, itemCount, maxColumnsForMinRows);
             const rows = Math.ceil(itemCount / columnsToFill);
             setColumns(Math.ceil(itemCount / rows));
         };
@@ -100,7 +105,7 @@ export function useBalancedColumns(
         const resizeObserver = new ResizeObserver(recalc);
         resizeObserver.observe(container);
         return () => resizeObserver.disconnect();
-    }, [containerRef, itemCount, minColumnWidth, gap]);
+    }, [containerRef, itemCount, minColumnWidth, gap, minRows]);
 
     return columns;
 }

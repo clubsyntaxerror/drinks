@@ -9,6 +9,9 @@ import type { Item } from "../app/drinksData";
 // balancing math (useBalancedColumns) agrees with how a row actually lays out.
 const MIN_CARD_WIDTH_PX = 176; // 11rem
 const GRID_GAP_PX = 16; // 1rem
+// Elixirs is designed around a 2-row grid regardless of exact item count (e.g. 8 -> 4x2), not
+// however many columns happen to fit at MIN_CARD_WIDTH_PX — see useBalancedColumns' minRows.
+const MIN_ROWS = 2;
 
 // `fitToViewport` is only turned on by the TV route: it scales the grid down (never up) so
 // it always fits the screen without scrolling, whatever the item count. The mobile route
@@ -17,7 +20,7 @@ export default function MenuGrid({ items, fitToViewport = false }: { items: Item
     const containerRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
     const scale = useFitToViewport(containerRef, contentRef, fitToViewport);
-    const columns = useBalancedColumns(containerRef, items.length, MIN_CARD_WIDTH_PX, GRID_GAP_PX);
+    const columns = useBalancedColumns(containerRef, items.length, MIN_CARD_WIDTH_PX, GRID_GAP_PX, MIN_ROWS);
 
     if (items.length === 0) {
         return null;
