@@ -205,10 +205,7 @@ export const samplePriceList: PriceListEntry[] = [
     { order: 2, label: "Cider", price: 72, happyHourPrice: 55, happyHourUntil: "23:00", active: true },
     { order: 3, label: "Wine", price: 98, happyHourPrice: 79, happyHourUntil: "23:00", active: true },
     { order: 4, label: "Sparkling", price: 92, happyHourPrice: 79, happyHourUntil: "23:00", active: true },
-    // Soda has no real happy-hour discount (same price either way) — happyHourPrice/Until left
-    // unset rather than set equal to `price`, so it just shows "30:-" plain instead of a
-    // redundant "30:- 30:-" (discounted-price + struck-through-original pair) during happy hour.
-    { order: 5, label: "Soda", price: 30, happyHourPrice: undefined, happyHourUntil: undefined, active: true },
+    { order: 5, label: "Soda", price: 39, happyHourPrice: 30, happyHourUntil: "23:00", active: true },
 ];
 
 export const sampleScreens: Screen[] = [
