@@ -7,11 +7,17 @@ import ScreenCarousel from "../../components/ScreenCarousel";
 // ScreenCarousel reads useSearchParams(), which Next.js requires to be wrapped. Background
 // renders inside ScreenCarousel itself now (it needs to follow the active screen's template).
 export default async function TvPage() {
-    const { items, messages, screens } = await getMenuData();
+    const { items, messages, screens, categoryPricing, priceList } = await getMenuData();
 
     return (
         <Suspense fallback={null}>
-            <ScreenCarousel screens={screens} items={items} messages={messages} />
+            <ScreenCarousel
+                screens={screens}
+                items={items}
+                messages={messages}
+                categoryPricing={categoryPricing}
+                priceList={priceList}
+            />
         </Suspense>
     );
 }

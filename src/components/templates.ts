@@ -1,15 +1,23 @@
 import type { ComponentType } from "react";
-import type { Item } from "../app/drinksData";
+import type { Item, CategoryPricing, PriceListEntry } from "../app/drinksData";
 // DEFAULT_TEMPLATE_KEY/TemplateKey come from templateKeys.ts, not drinksData.ts — this module
 // is imported by the client-side ScreenCarousel, and drinksData.ts pulls in ./sheets ->
-// googleapis (server-only). `Item` above is a type-only import so it's erased at build time
-// and doesn't have the same problem.
+// googleapis (server-only). `Item`/`CategoryPricing`/`PriceListEntry` above are type-only
+// imports so they're erased at build time and don't have the same problem.
 import { DEFAULT_TEMPLATE_KEY, type TemplateKey } from "../app/templateKeys";
 import MenuGrid from "./MenuGrid";
 import RosterGrid from "./RosterGrid";
 
 export type TemplateDefinition = {
-    Grid: ComponentType<{ items: Item[]; fitToViewport?: boolean }>;
+    // categoryPricing/priceList are elixirs-only (MenuGrid's PriceCard) — RosterGrid ignores
+    // them, but both need to be part of this shared shape since MenuScreen calls whichever
+    // Grid the active template resolves to without knowing which one it got.
+    Grid: ComponentType<{
+        items: Item[];
+        fitToViewport?: boolean;
+        categoryPricing?: CategoryPricing;
+        priceList?: PriceListEntry[];
+    }>;
     backgroundImage: string | undefined;
     backgroundTheme: "dungeon" | "arcade";
 };

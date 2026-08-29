@@ -49,3 +49,35 @@ export function isWithinDailyWindow(fromTime: string | undefined, toTime: string
 
     return true;
 }
+
+// Milliseconds from `now` until the next wall-clock occurrence of `time` ("HH:MM") — e.g. a
+// live "ends in HH:MM:SS" countdown toward a happy-hour cutoff (see PriceCard.tsx). Plain
+// same-day-or-tomorrow rollover rather than DAY_START_HOUR's business-day shift above: that
+// shift is for "is this active *now*" comparisons spanning midnight, but "how long until the
+// clock reads HH:MM" is just the next literal occurrence of that time, full stop. Only
+// meaningful while isWithinDailyWindow(undefined, time, now) is still true — once time's up,
+// "next occurrence" means tomorrow's, not "0 remaining".
+export function msUntilDailyTime(time: string, now: Date): number | undefined {
+    const targetMinutes = parseTimeToMinutes(time);
+    if (targetMinutes === undefined) {
+        return undefined;
+    }
+
+    const target = new Date(now);
+    target.setHours(Math.floor(targetMinutes / 60), targetMinutes % 60, 0, 0);
+    if (target.getTime() <= now.getTime()) {
+        target.setDate(target.getDate() + 1);
+    }
+
+    return target.getTime() - now.getTime();
+}
+
+// Formats milliseconds as "HH:MM:SS" for a countdown display.
+export function formatCountdown(ms: number): string {
+    const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}

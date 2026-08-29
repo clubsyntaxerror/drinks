@@ -126,7 +126,15 @@ active              boolean
 template           TemplateKey  — which visual template this screen renders as, see §8.1
 ```
 
-**Pricing is per-item, not per-screen** (revised again after the price-per-drink request came in): each `Recipe` carries its own optional `price`, rendered on its card (e.g. "139:-"). An earlier design had one shared price per `Screen`, shown once in `ScreenHeader` — that field has been removed; per-item pricing supersedes it.
+### CategoryPricing (a category's shared price)
+
+```
+category            string   — free text, matches Screen.key / Item.category
+price                 number?  — the category's standard price, e.g. 139
+nonAlcoholicPrice  number?  — the category's non-alcoholic variant price, e.g. 69
+```
+
+**Update (again):** `Recipe.price` is still in the data model but not currently rendered on cards (`SHOW_ITEM_PRICES` in `src/components/config.ts` toggles it back on). Pricing shown on `/tv` and `/` is once again per-category, not per-item — but this time as its own entity (`CategoryPricing`, its own sheet tab) rather than a field on `Screen` as the earlier design had it, so a category can carry pricing independently of whether it has a `Screen` row. `ScreenHeader` renders a category's `price`/`nonAlcoholicPrice` as two small item-tags flanking the screen title, looked up by matching `CategoryPricing.category` against the active `Screen.key`.
 
 Fetchers follow `website`'s `Event` type pattern (typed row-mapping function, `undefined`-safe optional columns, `cache()`-wrapped, `revalidate`-driven).
 
@@ -167,7 +175,7 @@ A blank or unrecognized sheet value for `Screen.template` falls back to `DEFAULT
 - **New, separate spreadsheet** — not a new tab on the existing Events sheet — so the bar team can be given edit access to just this file.
 - Same service account can be reused (share the new spreadsheet with the existing `GOOGLE_SHEETS_CLIENT_EMAIL`) or a fresh service account can be created — either works technically; reusing is simpler ops-wise.
 - New env var: `DRINKS_SPREADSHEET_ID` (parallel to `website`'s `SPREADSHEET_ID`).
-- Tabs: `Ingredients`, `Items`, `Messages`, `Screens` (§8), fetched with `sheets.spreadsheets.values.get({ range: "<TabName>" })`, one call per tab, each wrapped in React's `cache()` like `getEvents`.
+- Tabs: `Ingredients`, `Items`, `Messages`, `Screens`, `Categories` (§8), fetched with `sheets.spreadsheets.values.get({ range: "<TabName>" })`, one call per tab, each wrapped in React's `cache()` like `getEvents`.
 - Revalidation: same `revalidate = N` + `/api/revalidate` route pattern as `website`, but with a **much shorter window** than the 3600s used for events — periodic refresh (target ~120s) was chosen over building an instant Apps-Script-webhook path, so a sheet edit shows up on the TV within roughly two minutes with no extra moving parts.
 
 ## 10. Images & icons — can images be embedded in a Sheets cell?

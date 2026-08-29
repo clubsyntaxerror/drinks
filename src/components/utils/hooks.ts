@@ -79,6 +79,11 @@ export function useBalancedColumns(
     minColumnWidth: number,
     gap: number,
     minRows: number = 1,
+    // Subtracted from the measured container width before fitting columns — lets a caller
+    // reserve room for something else sharing the same row-balancing container (MenuGrid's
+    // PriceCard, which takes its own column outside this count) without it being squeezed out
+    // of the width this hook thinks it has to work with.
+    reservedWidthPx: number = 0,
 ) {
     const [columns, setColumns] = useState(() => Math.max(1, Math.min(itemCount, 4)));
 
@@ -89,7 +94,7 @@ export function useBalancedColumns(
         }
 
         const recalc = () => {
-            const width = container.clientWidth;
+            const width = container.clientWidth - reservedWidthPx;
             if (!width) {
                 return;
             }
@@ -105,7 +110,7 @@ export function useBalancedColumns(
         const resizeObserver = new ResizeObserver(recalc);
         resizeObserver.observe(container);
         return () => resizeObserver.disconnect();
-    }, [containerRef, itemCount, minColumnWidth, gap, minRows]);
+    }, [containerRef, itemCount, minColumnWidth, gap, minRows, reservedWidthPx]);
 
     return columns;
 }

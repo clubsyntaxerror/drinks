@@ -7,7 +7,7 @@ import Scrollbox from "../components/Scrollbox";
 // grid/card/background via its `template` field (see components/templates.ts), so each screen
 // section carries its own background rather than sharing one page-level layer.
 export default async function HomePage() {
-    const { items, messages, screens } = await getMenuData();
+    const { items, messages, screens, categoryPricing, priceList } = await getMenuData();
 
     return (
         <main className="mobile-menu">
@@ -16,6 +16,8 @@ export default async function HomePage() {
                     key={screen.key}
                     screen={screen}
                     items={items.filter((item) => item.category.toLowerCase() === screen.key.toLowerCase())}
+                    categoryPricing={categoryPricing}
+                    priceList={priceList}
                 />
             ))}
             <Scrollbox messages={messages} />

@@ -1,7 +1,7 @@
 import ScreenHeader from "./ScreenHeader";
 import Background from "./Background";
 import { getTemplate } from "./templates";
-import type { Item, Screen } from "../app/drinksData";
+import type { Item, Screen, CategoryPricing, PriceListEntry } from "../app/drinksData";
 
 // Shared by both routes: the mobile page stacks several of these and lets the page scroll;
 // the TV route renders one at a time inside ScreenCarousel with fitToViewport enabled. Which
@@ -10,13 +10,21 @@ import type { Item, Screen } from "../app/drinksData";
 export default function MenuScreen({
     screen,
     items,
+    categoryPricing = [],
+    priceList = [],
     fitToViewport = false,
 }: {
     screen: Screen;
     items: Item[];
+    categoryPricing?: CategoryPricing[];
+    priceList?: PriceListEntry[];
     fitToViewport?: boolean;
 }) {
     const template = getTemplate(screen.template);
+    // Resolved to this screen's own entry (if any) before handing it to the Grid — only the
+    // elixirs template's PriceCard currently uses it (see MenuGrid.tsx), matched by category
+    // the same way Item.category is matched against Screen.key elsewhere.
+    const pricing = categoryPricing.find((entry) => entry.category.toLowerCase() === screen.key.toLowerCase());
 
     return (
         <section className="menu-screen">
@@ -27,7 +35,12 @@ export default function MenuScreen({
                 viewport, not inset by this section's own padding. */}
             {!fitToViewport && <Background image={template.backgroundImage} theme={template.backgroundTheme} scoped />}
             <ScreenHeader title={screen.title} subtitle={screen.subtitle} />
-            <template.Grid items={items} fitToViewport={fitToViewport} />
+            <template.Grid
+                items={items}
+                fitToViewport={fitToViewport}
+                categoryPricing={pricing}
+                priceList={priceList}
+            />
         </section>
     );
 }

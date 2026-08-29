@@ -3,7 +3,7 @@
 import { useRef, type CSSProperties } from "react";
 import { useBalancedColumns } from "./utils/hooks";
 import CharacterCard from "./CharacterCard";
-import type { Item } from "../app/drinksData";
+import type { Item, CategoryPricing, PriceListEntry } from "../app/drinksData";
 
 // Deliberately lands 9 items at 3 columns/3 rows (not more columns) — .character-card stacks
 // portrait above text (see CharacterCard.tsx/globals.css), so packing it into many narrow
@@ -23,7 +23,18 @@ const GRID_GAP_PX = 20; // 1.25rem
 // in corner "plaques" pinned to the screen itself (see .roster-side-plaque), not the grid — so
 // they read as a screen-level frame element in the header row, and so they don't eat into the
 // grid's own share of the available height.
-export default function RosterGrid({ items, fitToViewport = false }: { items: Item[]; fitToViewport?: boolean }) {
+// categoryPricing/priceList aren't used here — they're MenuGrid's PriceCard's concern — but the
+// prop shape has to match TemplateDefinition.Grid (see templates.ts) since MenuScreen calls
+// whichever Grid the active template resolves to without knowing which one it got.
+export default function RosterGrid({
+    items,
+    fitToViewport = false,
+}: {
+    items: Item[];
+    fitToViewport?: boolean;
+    categoryPricing?: CategoryPricing;
+    priceList?: PriceListEntry[];
+}) {
     const containerRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
     const leftContainerRef = useRef<HTMLDivElement>(null);

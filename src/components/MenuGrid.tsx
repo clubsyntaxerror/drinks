@@ -3,7 +3,8 @@
 import { useRef, type CSSProperties } from "react";
 import { useFitToViewport, useBalancedColumns } from "./utils/hooks";
 import PotionCard from "./PotionCard";
-import type { Item } from "../app/drinksData";
+import PriceCard from "./PriceCard";
+import type { Item, CategoryPricing, PriceListEntry } from "../app/drinksData";
 
 // Cards are sized around .potion-card in globals.css — kept in sync here so the column-
 // balancing math (useBalancedColumns) agrees with how a row actually lays out.
@@ -12,6 +13,15 @@ const GRID_GAP_PX = 16; // 1rem
 // Elixirs is designed around a 2-row grid regardless of exact item count (e.g. 8 -> 4x2), not
 // however many columns happen to fit at MIN_CARD_WIDTH_PX — see useBalancedColumns' minRows.
 const MIN_ROWS = 2;
+// PriceCard (see below) takes its own leading column, spanning both rows, outside the balanced
+// potion-card count — reserved so useBalancedColumns fits the *remaining* width, not the whole
+// container. It's also wider than a potion column (PRICE_CARD_WIDTH_MULTIPLIER, for larger price
+// text) and stands apart from the potion grid via its own margin-right (globals.css, "stand out
+// a bit") — both kept in sync with the reserved-width math here so columns don't overflow.
+const PRICE_CARD_WIDTH_MULTIPLIER = 1.3;
+const PRICE_CARD_EXTRA_GAP_PX = 48; // 3rem, kept in sync with .price-card's margin-right
+const PRICE_CARD_RESERVED_WIDTH_PX =
+    MIN_CARD_WIDTH_PX * PRICE_CARD_WIDTH_MULTIPLIER + GRID_GAP_PX + PRICE_CARD_EXTRA_GAP_PX;
 
 // `fitToViewport` is only turned on by the TV route: it scales the grid down (never up) so
 // it always fits the screen without scrolling, whatever the item count, using useBalancedColumns
@@ -21,13 +31,34 @@ const MIN_ROWS = 2;
 // page much better than the TV route's row-balancing math: there's no fixed viewport to fit
 // exactly, just "how many columns look right at this width," and a JS-computed column count
 // was landing on visually inconsistent results across nearby phone widths.
-export default function MenuGrid({ items, fitToViewport = false }: { items: Item[]; fitToViewport?: boolean }) {
+export default function MenuGrid({
+    items,
+    fitToViewport = false,
+    categoryPricing,
+    priceList = [],
+}: {
+    items: Item[];
+    fitToViewport?: boolean;
+    categoryPricing?: CategoryPricing;
+    priceList?: PriceListEntry[];
+}) {
     const containerRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
+    const hasPriceCard =
+        categoryPricing?.price !== undefined ||
+        categoryPricing?.nonAlcoholicPrice !== undefined ||
+        priceList.length > 0;
+    const columns = useBalancedColumns(
+        containerRef,
+        items.length,
+        MIN_CARD_WIDTH_PX,
+        GRID_GAP_PX,
+        MIN_ROWS,
+        hasPriceCard ? PRICE_CARD_RESERVED_WIDTH_PX : 0,
+    );
     const scale = useFitToViewport(containerRef, contentRef, fitToViewport);
-    const columns = useBalancedColumns(containerRef, items.length, MIN_CARD_WIDTH_PX, GRID_GAP_PX, MIN_ROWS);
 
-    if (items.length === 0) {
+    if (items.length === 0 && !hasPriceCard) {
         return null;
     }
 
@@ -39,13 +70,16 @@ export default function MenuGrid({ items, fitToViewport = false }: { items: Item
                 style={
                     fitToViewport
                         ? ({
-                              gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+                              gridTemplateColumns: hasPriceCard
+                                  ? `${PRICE_CARD_WIDTH_MULTIPLIER}fr repeat(${columns}, minmax(0, 1fr))`
+                                  : `repeat(${columns}, minmax(0, 1fr))`,
                               transform: `scale(${scale})`,
                               transformOrigin: "top center",
                           } as CSSProperties)
                         : undefined
                 }
             >
+                {hasPriceCard && <PriceCard categoryPricing={categoryPricing} priceList={priceList} />}
                 {items.map((item, index) => (
                     <PotionCard key={`${item.category}-${item.name}-${index}`} item={item} index={index} />
                 ))}

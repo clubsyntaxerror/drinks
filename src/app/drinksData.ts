@@ -1,6 +1,13 @@
 import { cache } from "react";
 import { getSheetRows } from "./sheets";
-import { sampleIngredients, sampleRecipes, sampleMessages, sampleScreens } from "./sampleData";
+import {
+    sampleIngredients,
+    sampleRecipes,
+    sampleMessages,
+    sampleScreens,
+    sampleCategoryPricing,
+    samplePriceList,
+} from "./sampleData";
 import { TEMPLATE_KEYS, DEFAULT_TEMPLATE_KEY, type TemplateKey } from "./templateKeys";
 
 export const revalidate = 120;
@@ -69,6 +76,31 @@ export type Screen = {
     durationSeconds: number;
     active: boolean;
     template: TemplateKey; // which visual template this screen renders as — see TEMPLATE_KEYS above
+};
+
+// A category-wide price (e.g. "elixirs" -> 139:-/69:- non-alcoholic), shown once in the price
+// list card (see PriceCard) rather than repeated on every card — separate from Recipe.price,
+// which is still per-item and just not rendered right now (see SHOW_ITEM_PRICES in
+// components/config.ts). Its own entity/sheet tab, not a field on Screen, so a category can
+// carry pricing independently of whether it has a Screen row at all.
+export type CategoryPricing = {
+    category: string; // free text, matches Screen.key / Item.category
+    price: number | undefined;
+    nonAlcoholicPrice: number | undefined;
+};
+
+// A single "quick reference" row in the same price list card, e.g. "Beer" -> 89:-. Unlike
+// CategoryPricing/Recipe, these don't correspond to a Screen or Item — Beer/Cider/Wine/
+// Sparkling/Soda aren't individually modeled drinks in this menu (see sampleMessages' happy-hour
+// banner, which this list's numbers back up), just a flat reference list. happyHourPrice, when
+// set, is shown (with `price` struck through) up until happyHourUntil — see isWithinDailyWindow.
+export type PriceListEntry = {
+    order: number;
+    label: string; // e.g. "Beer", "Cider", "Wine", "Sparkling", "Soda"
+    price: number;
+    happyHourPrice: number | undefined;
+    happyHourUntil: string | undefined; // "HH:MM", venue day
+    active: boolean;
 };
 
 function isTruthy(value: string | undefined) {
@@ -209,21 +241,69 @@ export const getScreens = cache(async (): Promise<Screen[]> => {
     }
 });
 
+export const getCategoryPricing = cache(async (): Promise<CategoryPricing[]> => {
+    try {
+        const rows = await getSheetRows("Categories");
+        return rows
+            .slice(1)
+            .map(
+                (row) =>
+                    ({
+                        category: (row[0] ?? "").trim(),
+                        price: row[1] ? Number(row[1]) || undefined : undefined,
+                        nonAlcoholicPrice: row[2] ? Number(row[2]) || undefined : undefined,
+                    }) satisfies CategoryPricing,
+            )
+            .filter((entry) => entry.category);
+    } catch (err) {
+        console.log(err);
+        return [];
+    }
+});
+
+export const getPriceList = cache(async (): Promise<PriceListEntry[]> => {
+    try {
+        const rows = await getSheetRows("PriceList");
+        return rows
+            .slice(1)
+            .map(
+                (row) =>
+                    ({
+                        order: Number(row[0]) || 0,
+                        label: row[1] ?? "",
+                        price: Number(row[2]) || 0,
+                        happyHourPrice: row[3] ? Number(row[3]) || undefined : undefined,
+                        happyHourUntil: row[4] || undefined,
+                        active: isTruthy(row[5]),
+                    }) satisfies PriceListEntry,
+            )
+            .filter((entry) => entry.active && entry.label)
+            .sort((a, b) => a.order - b.order);
+    } catch (err) {
+        console.log(err);
+        return [];
+    }
+});
+
 export type MenuData = {
     items: Item[];
     messages: Message[];
     screens: Screen[];
+    categoryPricing: CategoryPricing[];
+    priceList: PriceListEntry[];
 };
 
 // Aggregates every tab for a route in one call. Falls back to bundled sample content when the
 // spreadsheet isn't reachable/configured yet or is simply still empty, so the site always
 // renders something meaningful instead of a blank menu.
 export const getMenuData = cache(async (): Promise<MenuData> => {
-    const [recipes, ingredients, messages, screens] = await Promise.all([
+    const [recipes, ingredients, messages, screens, categoryPricing, priceList] = await Promise.all([
         getRecipes(),
         getIngredients(),
         getMessages(),
         getScreens(),
+        getCategoryPricing(),
+        getPriceList(),
     ]);
 
     if (recipes.length === 0 && screens.length === 0) {
@@ -231,8 +311,10 @@ export const getMenuData = cache(async (): Promise<MenuData> => {
             items: composeRecipes(sampleRecipes, sampleIngredients),
             messages: sampleMessages,
             screens: sampleScreens,
+            categoryPricing: sampleCategoryPricing,
+            priceList: samplePriceList,
         };
     }
 
-    return { items: composeRecipes(recipes, ingredients), messages, screens };
+    return { items: composeRecipes(recipes, ingredients), messages, screens, categoryPricing, priceList };
 });

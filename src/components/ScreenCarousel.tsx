@@ -7,7 +7,7 @@ import MenuScreen from "./MenuScreen";
 import Scrollbox from "./Scrollbox";
 import Background from "./Background";
 import { getTemplate } from "./templates";
-import type { Item, Message, Screen } from "../app/drinksData";
+import type { Item, Message, Screen, CategoryPricing, PriceListEntry } from "../app/drinksData";
 
 // TV-only: cycles through `screens` on a per-screen timer read from the sheet. Debug params:
 // ?screen=<index> jumps straight to a screen, ?paused=1 stops the timer — both for on-site
@@ -16,10 +16,14 @@ export default function ScreenCarousel({
     screens,
     items,
     messages,
+    categoryPricing,
+    priceList,
 }: {
     screens: Screen[];
     items: Item[];
     messages: Message[];
+    categoryPricing: CategoryPricing[];
+    priceList: PriceListEntry[];
 }) {
     const searchParams = useSearchParams();
     const paused = searchParams.get("paused") === "1";
@@ -79,7 +83,13 @@ export default function ScreenCarousel({
                     className={`tv-stage-screen${prefersReducedMotion ? "" : " tv-stage-animated"}`}
                     key={`screen-${active.key}`}
                 >
-                    <MenuScreen screen={active} items={activeItems} fitToViewport />
+                    <MenuScreen
+                        screen={active}
+                        items={activeItems}
+                        categoryPricing={categoryPricing}
+                        priceList={priceList}
+                        fitToViewport
+                    />
                 </div>
                 <Scrollbox messages={messages} />
             </div>

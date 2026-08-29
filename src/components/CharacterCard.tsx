@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { IngredientGlyph, OutOfStockCross, TintedGlyph } from "./icons";
 import { withMinLightness } from "./utils/color";
+import { SHOW_ITEM_PRICES } from "./config";
 import type { Item } from "../app/drinksData";
 
 // WIP placeholder for the Drinks "character select" template (see spec.md/README): stands in
@@ -18,8 +19,8 @@ export default function CharacterCard({ item, index }: { item: Item; index: numb
                 } as CSSProperties
             }
         >
-            <span className="character-index">{String(index + 1).padStart(2, "0")}</span>
-            {item.price !== undefined && <span className="character-price">{item.price}:-</span>}
+            <span className="character-index">{index + 1}</span>
+            {SHOW_ITEM_PRICES && item.price !== undefined && <span className="character-price">{item.price}:-</span>}
             <div className="character-portrait" aria-hidden="true">
                 <TintedGlyph glyph={item.emblem ?? "❔"} color={item.accentColor} className="character-portrait-icon" />
             </div>

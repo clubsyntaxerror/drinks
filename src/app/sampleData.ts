@@ -1,7 +1,7 @@
 // Placeholder content shown when the Google Sheet isn't configured yet (no env vars) or is
 // reachable but empty. Lets `npm run dev` render a real-looking menu before the spreadsheet
 // exists. Swapped out automatically the moment the sheet returns real rows — see getMenuData().
-import type { Ingredient, Recipe, Message, Screen } from "./drinksData";
+import type { Ingredient, Recipe, Message, Screen, CategoryPricing, PriceListEntry } from "./drinksData";
 
 export const sampleIngredients: Ingredient[] = [
     // Spirits. `icon` is set explicitly here rather than left to IngredientGlyph's
@@ -187,6 +187,28 @@ export const sampleMessages: Message[] = [
         fromTime: undefined,
         toTime: "01:00",
     },
+];
+
+// Shown in PriceCard's top two rows ("Elixir"/"Non-alcoholic"), not per-card — see CategoryPricing.
+export const sampleCategoryPricing: CategoryPricing[] = [
+    {
+        category: "elixirs",
+        price: 139,
+        nonAlcoholicPrice: 69,
+    },
+];
+
+// Backs PriceCard's "basics" rows — matches sampleMessages' happy-hour banner below rather than
+// the (currently inactive) "basics" Screen/Recipes.
+export const samplePriceList: PriceListEntry[] = [
+    { order: 1, label: "Beer", price: 74, happyHourPrice: 55, happyHourUntil: "23:00", active: true },
+    { order: 2, label: "Cider", price: 72, happyHourPrice: 55, happyHourUntil: "23:00", active: true },
+    { order: 3, label: "Wine", price: 98, happyHourPrice: 79, happyHourUntil: "23:00", active: true },
+    { order: 4, label: "Sparkling", price: 92, happyHourPrice: 79, happyHourUntil: "23:00", active: true },
+    // Soda has no real happy-hour discount (same price either way) — happyHourPrice/Until left
+    // unset rather than set equal to `price`, so it just shows "30:-" plain instead of a
+    // redundant "30:- 30:-" (discounted-price + struck-through-original pair) during happy hour.
+    { order: 5, label: "Soda", price: 30, happyHourPrice: undefined, happyHourUntil: undefined, active: true },
 ];
 
 export const sampleScreens: Screen[] = [

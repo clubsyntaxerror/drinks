@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { PotionArt, IngredientGlyph, OutOfStockCross } from "./icons";
 import { withMinLightness } from "./utils/color";
+import { SHOW_ITEM_PRICES } from "./config";
 import type { Item } from "../app/drinksData";
 
 export default function PotionCard({ item, index }: { item: Item; index: number }) {
@@ -21,8 +22,8 @@ export default function PotionCard({ item, index }: { item: Item; index: number 
             {/* Tints the (otherwise neutral-gray) frame.png border warm gold, with an animated
                 specular glint sweeping across it — see globals.css for how the mask/blend work. */}
             <span aria-hidden="true" className="potion-card-frame-shine" />
-            <span className="potion-index">{String(index + 1).padStart(2, "0")}</span>
-            {item.price !== undefined && <span className="potion-price">{item.price}:-</span>}
+            <span className="potion-index">{index + 1}</span>
+            {SHOW_ITEM_PRICES && item.price !== undefined && <span className="potion-price">{item.price}:-</span>}
             <div className="potion-icon-wrap">
                 <PotionArt color={item.accentColor} emblem={item.emblem} className="potion-icon" />
             </div>

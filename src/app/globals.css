@@ -234,15 +234,18 @@ body {
     width: 100%;
 }
 
+/* First column carries .price-card (see below) — sized wider than the rest (same
+   PRICE_CARD_WIDTH_MULTIPLIER as MenuGrid's own TV-route inline style, kept in sync by eye
+   since this path is plain CSS, not JS) rather than an equal share, for larger price text. */
 @media (min-width: 640px) {
     .menu-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: minmax(0, 1.3fr) repeat(1, minmax(0, 1fr));
     }
 }
 
 @media (min-width: 960px) {
     .menu-grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr));
     }
 }
 
@@ -309,6 +312,13 @@ body {
            just sizes the box directly. */
         width: min(60%, 18rem);
         margin-inline: auto;
+    }
+
+    /* .price-card's own margin-right (below) is for standing apart from a multi-column potion
+       grid — at this single-column breakpoint there's no grid to stand apart from, so it'd just
+       read as off-center. */
+    .price-card {
+        margin-right: auto;
     }
 }
 
@@ -428,7 +438,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 0.9rem;
+    margin-top: 0.6rem;
 }
 
 .potion-body {
@@ -436,6 +446,125 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* MenuGrid's leading grid card (see PriceCard.tsx) — reuses .potion-card's frame/background
+   (rendered with both classes: `potion-card price-card`) but overrides its sizing: spans both
+   of the grid's rows instead of holding the 3:4 potion aspect-ratio, and sits in the grid's
+   first (wider — see MenuGrid's PRICE_CARD_WIDTH_MULTIPLIER) column always, regardless of how
+   many potion columns the row-balancing math picks. margin-right stands it apart from the
+   potion grid ("stand out a bit") — kept in sync with MenuGrid's PRICE_CARD_EXTRA_GAP_PX, which
+   reserves the matching width so this margin doesn't just squeeze the last potion column
+   instead. Top-aligned (not vertically centered) with generous top padding, rather than
+   .potion-card's centered content, so the price list reads top-down like a menu board. */
+.price-card {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    aspect-ratio: auto;
+    margin-right: 3rem;
+    padding: calc(2.4rem + 4px) calc(1.6rem + 4px) calc(1.6rem + 4px);
+    justify-content: flex-start;
+    text-align: left;
+    /* frame.png (192x256, 3:4) is built for a single card's own proportions — stretched over
+       this box's roughly-double height it'd read visibly squashed. frame-tall.png (192x512,
+       3:8) is the same border art redrawn for a two-row-tall card instead, so it swaps in here
+       in place of .potion-card's own background (kept as the same no-repeat/center/100%/100%
+       stretch + dark fill, just a different source image). */
+    background:
+        url("/assets/frame-tall.png") no-repeat center / 100% 100%,
+        rgba(0, 0, 0, 0.7);
+}
+
+/* .potion-card-frame-shine's mask reuses whichever frame asset is under it (see comment above)
+   so the gold tint/glint lands on the tall frame's actual border art instead of the normal
+   card's — same reasoning as the background swap just above. */
+.price-card .potion-card-frame-shine {
+    -webkit-mask-image: url("/assets/frame-tall.png");
+    mask-image: url("/assets/frame-tall.png");
+}
+
+.price-card-body {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.price-list-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    font-family: var(--font-bitpotion);
+    font-size: 1.35rem;
+}
+
+/* The Elixirs/Non-alcoholic rows carry more weight than the basics reference list below them —
+   sized up a bit rather than sharing .price-list-row's plain size. */
+.price-list-row-category {
+    font-size: 1.55rem;
+}
+
+.price-list-label {
+    color: #cfc7b8;
+    white-space: nowrap;
+}
+
+.price-list-value {
+    color: var(--gold);
+    white-space: nowrap;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+.price-list-strike {
+    color: #8d8477;
+    text-decoration: line-through;
+    text-shadow: none;
+}
+
+.price-list-happy {
+    color: #4ade80;
+}
+
+/* A blank gap roughly a row's height, not a drawn rule — a literal <hr> line read as too
+   "modern"/flat against the rest of the card's pixel-art frame styling; empty space alone
+   still separates the Elixirs/Non-alcoholic prices from the basics list below it. */
+.price-list-spacer {
+    height: 1.7rem;
+}
+
+/* "Happy Hour" framed as an active status effect/buff (RPG-menu voice, matching the rest of the
+   card) rather than plain signage copy — green like .price-list-happy's discounted price, since
+   it's announcing the same thing that price is already showing. margin-top: auto pins it to the
+   card's bottom edge regardless of how many rows are above it (.price-card is a flex column),
+   rather than sitting wherever the price list happens to end. Only rendered while at least one
+   row's happy-hour window is actually open — see PriceCard.tsx. */
+.price-card-status {
+    margin-top: auto;
+    padding-top: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.15rem;
+    text-align: center;
+    color: #4ade80;
+    font-family: var(--font-bitpotion);
+}
+
+.price-card-status-label {
+    font-size: 1.4rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.price-card-status-timer {
+    font-size: 1.6rem;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+    /* Tabular-ish alignment for the ticking digits — var(--font-bitpotion) is a fixed-width
+       pixel font already, but font-variant-numeric is cheap insurance against any fallback
+       font (see layout.tsx) rendering proportional digits that'd jitter the countdown's width
+       every second. */
+    font-variant-numeric: tabular-nums;
 }
 
 /* Out-of-stock: derived automatically whenever any composing ingredient's inStock is false
@@ -510,7 +639,12 @@ body {
 .potion-icon {
     position: relative;
     display: block;
-    width: calc((100% + 3.4rem) * 128 / 192);
+    /* * 0.82: narrower potion columns (since .price-card grew — see MenuGrid's
+       PRICE_CARD_WIDTH_MULTIPLIER/PRICE_CARD_EXTRA_GAP_PX) left less width per card for the
+       same flavor-line text length, wrapping some onto a line the card's fixed aspect-ratio
+       didn't have room for (text overflowing the frame). Shrinking the icon trades some of its
+       own vertical space for that line, at the same text size, rather than shrinking the text. */
+    width: calc((100% + 3.4rem) * 128 / 192 * 0.82);
     height: auto;
     aspect-ratio: 1 / 1; /* potion.png is 128x128 */
 }
@@ -1109,7 +1243,7 @@ body {
    The multipliers/caps themselves are also bumped up from the shared base rule (not just
    ported 1:1) — a bit more legible from across a bar than the mobile-tuned sizes. */
 .tv-stage .potion-icon-wrap {
-    margin-top: 1.5rem;
+    margin-top: 0.9rem;
 }
 
 .tv-stage .screen-title {
@@ -1130,6 +1264,30 @@ body {
 
 .tv-stage .potion-base {
     font-size: clamp(0.85rem, calc(3.1 * var(--tv-vw)), 2.9rem);
+}
+
+.tv-stage .price-card {
+    padding: calc(2.2 * var(--tv-vw) + 4px) calc(1.6 * var(--tv-vw) + 4px) calc(1.6 * var(--tv-vw) + 4px);
+}
+
+.tv-stage .price-list-row {
+    font-size: clamp(1.05rem, calc(3.8 * var(--tv-vw)), 3.2rem);
+}
+
+.tv-stage .price-list-row-category {
+    font-size: clamp(1.2rem, calc(4.4 * var(--tv-vw)), 3.7rem);
+}
+
+.tv-stage .price-list-spacer {
+    height: clamp(1.5rem, calc(5.5 * var(--tv-vw)), 4.6rem);
+}
+
+.tv-stage .price-card-status-label {
+    font-size: clamp(1.1rem, calc(3.4 * var(--tv-vw)), 2.8rem);
+}
+
+.tv-stage .price-card-status-timer {
+    font-size: clamp(1.25rem, calc(3.9 * var(--tv-vw)), 3.2rem);
 }
 
 .tv-stage .potion-index,
