@@ -50,6 +50,20 @@ export function isWithinDailyWindow(fromTime: string | undefined, toTime: string
     return true;
 }
 
+// No happy hour during Halloween week (Oct 25–31, every year), whatever the sheet says — the
+// price card shows full prices and any scrollbox message mentioning "happy hour" is hidden.
+// Plain calendar date rather than DAY_START_HOUR's venue day: happy hour always ends well before
+// midnight, so the small hours either side of the window never have one running anyway.
+const HAPPY_HOUR_BLACKOUT = { month: 9, fromDay: 25, toDay: 31 }; // month is 0-based (9 = October)
+
+export function isHappyHourBlackout(now: Date): boolean {
+    return (
+        now.getMonth() === HAPPY_HOUR_BLACKOUT.month &&
+        now.getDate() >= HAPPY_HOUR_BLACKOUT.fromDay &&
+        now.getDate() <= HAPPY_HOUR_BLACKOUT.toDay
+    );
+}
+
 // Milliseconds from `now` until the next wall-clock occurrence of `time` ("HH:MM") — e.g. a
 // live "ends in HH:MM:SS" countdown toward a happy-hour cutoff (see PriceCard.tsx). Plain
 // same-day-or-tomorrow rollover rather than DAY_START_HOUR's business-day shift above: that

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { isWithinDailyWindow, msUntilDailyTime, formatCountdown } from "./utils/time";
+import { isWithinDailyWindow, isHappyHourBlackout, msUntilDailyTime, formatCountdown } from "./utils/time";
 import type { CategoryPricing, PriceListEntry } from "../app/drinksData";
 
 // undefined until mounted, then ticks every second. Left undefined for both the server render
@@ -24,7 +24,10 @@ function useNow(): Date | undefined {
 
 function PriceRow({ label, price, happyHourPrice, happyHourUntil, now }: PriceListEntry & { now: Date | undefined }) {
     const isHappyHour =
-        now !== undefined && happyHourPrice !== undefined && isWithinDailyWindow(undefined, happyHourUntil, now);
+        now !== undefined &&
+        happyHourPrice !== undefined &&
+        !isHappyHourBlackout(now) &&
+        isWithinDailyWindow(undefined, happyHourUntil, now);
 
     return (
         <div className="price-list-row">
@@ -67,7 +70,7 @@ export default function PriceCard({
     // copy, matching the RPG-menu voice the rest of the card/site is written in. Empty (so the
     // footer stays hidden) until mounted, same reasoning as useNow above.
     const activeHappyHourUntils =
-        now === undefined
+        now === undefined || isHappyHourBlackout(now)
             ? []
             : priceList
                   .filter(

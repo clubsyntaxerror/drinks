@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Textra from "react-textra";
 import { useMediaQuery } from "./utils/hooks";
-import { isWithinDailyWindow } from "./utils/time";
+import { isWithinDailyWindow, isHappyHourBlackout } from "./utils/time";
 import type { Message } from "../app/drinksData";
 
 function StaticMessages({ messages }: { messages: string[] }) {
@@ -31,8 +31,12 @@ function useActiveMessages(messages: Message[]): string[] {
         return () => clearInterval(interval);
     }, []);
 
+    // Matched on text since Messages rows don't say what they're about — see isHappyHourBlackout.
+    const hideHappyHour = isHappyHourBlackout(now);
+
     return messages
         .filter((message) => isWithinDailyWindow(message.fromTime, message.toTime, now))
+        .filter((message) => !(hideHappyHour && /happy\s*hour/i.test(message.text)))
         .map((message) => message.text);
 }
 
